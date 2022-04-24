@@ -9,7 +9,7 @@
 //! [reset]: struct.Counter.html#method.reset
 
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
-use near_sdk::{env, near_bindgen};
+use near_sdk::{env, near_bindgen, Promise};
 
 near_sdk::setup_alloc!();
 

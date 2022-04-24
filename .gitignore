@@ -1,7 +1,13 @@
+# vscode
+.vscode
+
 # rust
 target/*
 
-#node
+# node
 */node_modules
 */dist
 */pkg
+
+# near
+neardev

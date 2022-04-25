@@ -1,27 +1,30 @@
 use near_sdk::{near_bindgen, AccountId};
 
-use crate::{utils::with_storage_payment, *};
+use crate::{
+    contract_interface::MintNFT,
+    models::{husy::*, meme::MemeToken, meme::MemeTokenId, meme_metadata::MemeTokenMetadata},
+    utils::with_storage_payment,
+};
 
 #[near_bindgen]
-impl HusyContract {
+impl MintNFT for HusyContract {
     #[payable]
-    pub fn nft_mint(
+    fn nft_mint(
         &mut self,
-        meme_token_id: MemeTokenId,
-        meme_token_metadata: MemeTokenMetadata,
+        token_id: MemeTokenId,
+        token_metadata: MemeTokenMetadata,
         receiver_id: AccountId,
     ) {
         with_storage_payment(|| {
-            let meme = Meme {
+            let meme = MemeToken {
                 owner_id: receiver_id,
             };
             assert!(
-                self.memes_by_id.insert(&meme_token_id, &meme).is_none(),
+                self.memes_by_id.insert(&token_id, &meme).is_none(),
                 "Meme already exists"
             );
-            self.meme_metadata_by_id
-                .insert(&meme_token_id, &meme_token_metadata);
-            self.add_meme_to_owner(&meme.owner_id, &meme_token_id)
+            self.meme_metadata_by_id.insert(&token_id, &token_metadata);
+            self.add_meme_to_owner(&meme.owner_id, &token_id)
         });
     }
 }

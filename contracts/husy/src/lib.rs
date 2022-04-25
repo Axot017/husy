@@ -5,6 +5,7 @@ use near_sdk::{
     near_bindgen, AccountId, CryptoHash, PanicOnDefault,
 };
 
+mod nft_core;
 mod metadata;
 mod mint;
 mod utils;

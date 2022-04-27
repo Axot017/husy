@@ -1,0 +1,45 @@
+name: Husy test
+
+on:
+  pull_request:
+    branches: [master]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  husy-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      husy: ${{ steps.filter.outputs.husy }}
+    steps:
+    - uses: actions/checkout@v2
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          husy:
+            - 'contracts/husy/**'
+
+  run-husy-tests:
+    runs-on: ubuntu-latest
+    env:
+      cache_id: husy
+    needs: husy-changes
+    if: ${{ needs.husy-changes.outputs.husy == 'true' }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            ./target
+          key: ${{ env.cache_id }}-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-${{ env.RUSTC_HASH }}
+
+      - name: test-husy
+        working-directory: ./contracts/husy
+        run: |
+          cargo test -- --nocapture --test-threads 1

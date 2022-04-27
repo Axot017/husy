@@ -1,6 +1,10 @@
-use near_sdk::{borsh::{self, BorshDeserialize, BorshSerialize}, serde::{Serialize, Deserialize}, json_types::Base64VecU8};
+use near_sdk::{
+    borsh::{self, BorshDeserialize, BorshSerialize},
+    json_types::Base64VecU8,
+    serde::{Deserialize, Serialize},
+};
 
-#[derive(BorshDeserialize, BorshSerialize, Serialize, Deserialize, Clone)]
+#[derive(BorshDeserialize, BorshSerialize, Serialize, Deserialize, PartialEq, Clone, Debug)]
 #[serde(crate = "near_sdk::serde")]
 pub struct HusyNFTContractMetadata {
     pub spec: String,

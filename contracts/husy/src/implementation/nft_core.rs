@@ -73,8 +73,8 @@ mod test {
 
     fn get_context(predecessor_account_id: String, storage_usage: u64) -> VMContext {
         VMContext {
-            current_account_id: "alice.testnet".to_string(),
-            signer_account_id: "jane.testnet".to_string(),
+            current_account_id: "current.testnet".to_string(),
+            signer_account_id: "signer.testnet".to_string(),
             signer_account_pk: vec![0, 1, 2],
             predecessor_account_id,
             input: vec![],
@@ -94,7 +94,7 @@ mod test {
 
     #[test]
     fn some_nft_token() {
-        let context = get_context("aaa.testnet".to_string(), 0);
+        let context = get_context("aaa.testnet".to_string(), 10000000);
         testing_env!(context);
         let mut contract = HusyContract::new_default("aaa.testnet".to_string());
 
@@ -127,12 +127,12 @@ mod test {
 
     #[test]
     fn none_nft_token() {
-        let context = get_context("aaa.testnet".to_string(), 0);
+        let context = get_context("aaa.testnet".to_string(), 10000000);
         testing_env!(context);
         let contract = HusyContract::new_default("aaa.testnet".to_string());
 
         let result = contract.nft_token("not_existing_id.testnet".to_string());
 
-        assert_eq!(result, None)
+        assert_eq!(result, None);
     }
 }

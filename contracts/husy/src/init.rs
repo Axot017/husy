@@ -2,7 +2,7 @@ use near_sdk::borsh::BorshSerialize;
 use near_sdk::collections::{LazyOption, LookupMap, UnorderedMap};
 use near_sdk::{near_bindgen, AccountId};
 
-use crate::contract_interface::ContractInit;
+use crate::interface::ContractInit;
 use crate::models::storage::StorageKey;
 use crate::models::{husy::*, husy_metadata::HusyNFTContractMetadata};
 

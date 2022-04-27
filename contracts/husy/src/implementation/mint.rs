@@ -1,7 +1,7 @@
 use near_sdk::{near_bindgen, AccountId};
 
 use crate::{
-    contract_interface::MintNFT,
+    interface::MintNFT,
     models::{husy::*, meme::MemeToken, meme::MemeTokenId, meme_metadata::MemeTokenMetadata},
     utils::payment::with_storage_payment,
 };

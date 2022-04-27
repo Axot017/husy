@@ -8,12 +8,12 @@ use super::meme_metadata::MemeTokenMetadata;
 
 pub type MemeTokenId = String;
 
-#[derive(BorshDeserialize, BorshSerialize)]
+#[derive(BorshDeserialize, BorshSerialize, PartialEq, Clone, Debug)]
 pub struct MemeToken {
     pub owner_id: AccountId,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
 #[serde(crate = "near_sdk::serde")]
 pub struct MemeTokenView {
     pub token_id: MemeTokenId,

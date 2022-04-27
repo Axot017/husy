@@ -4,7 +4,7 @@ use near_sdk::{
     serde::{Deserialize, Serialize},
 };
 
-#[derive(BorshDeserialize, BorshSerialize, Serialize, Deserialize)]
+#[derive(BorshDeserialize, BorshSerialize, Serialize, Deserialize, PartialEq, Default, Debug, Clone)]
 #[serde(crate = "near_sdk::serde")]
 pub struct MemeTokenMetadata {
     pub title: Option<String>,

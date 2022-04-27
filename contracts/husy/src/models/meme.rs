@@ -13,7 +13,7 @@ pub struct MemeToken {
     pub owner_id: AccountId,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 #[serde(crate = "near_sdk::serde")]
 pub struct MemeTokenView {
     pub token_id: MemeTokenId,

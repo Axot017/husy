@@ -1,7 +1,5 @@
-mod contract_interface;
+mod interface;
 mod init;
-mod metadata;
-mod mint;
-pub mod models;
-mod nft_core;
+mod models;
 mod utils;
+mod implementation;

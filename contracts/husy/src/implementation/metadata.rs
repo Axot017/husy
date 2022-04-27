@@ -1,6 +1,6 @@
 use near_sdk::near_bindgen;
 
-use crate::contract_interface::NFTContractMetadata;
+use crate::interface::NFTContractMetadata;
 use crate::models::husy::*;
 use crate::models::husy_metadata::HusyNFTContractMetadata;
 

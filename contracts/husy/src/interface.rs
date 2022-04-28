@@ -62,7 +62,7 @@ pub trait NFTTokenCore {
 }
 
 pub trait NFTEnumeration {
-    fn nft_total_supply(&self);
+    fn nft_total_supply(&self) -> U128;
 
     fn nft_tokens(&self, from_index: Option<U128>, limit: Option<u64>);
 

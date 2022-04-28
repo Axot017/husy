@@ -31,7 +31,7 @@ impl MintNFT for HusyContract {
 
 #[cfg(test)]
 mod test {
-    use near_sdk::{env, testing_env, VMContext};
+    use near_sdk::{testing_env, VMContext};
     use near_sdk::{Balance, MockedBlockchain};
 
     use crate::interface::ContractInit;

@@ -64,7 +64,7 @@ pub trait NFTTokenCore {
 pub trait NFTEnumeration {
     fn nft_total_supply(&self) -> U128;
 
-    fn nft_tokens(&self, from_index: Option<U128>, limit: Option<u64>);
+    fn nft_tokens(&self, from_index: Option<U128>, limit: Option<u64>) -> Vec<MemeTokenView>;
 
     fn nft_supply_for_owner(&self, account_id: AccountId) -> U128;
 

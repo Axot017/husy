@@ -11,7 +11,9 @@ impl NFTEnumeration for HusyContract {
         U128(self.meme_metadata_by_id.len().into())
     }
 
-    fn nft_tokens(&self, from_index: Option<U128>, limit: Option<u64>) {}
+    fn nft_tokens(&self, from_index: Option<U128>, limit: Option<u64>)  -> Vec<MemeTokenView> {
+        return vec![];
+    }
 
     fn nft_supply_for_owner(&self, account_id: AccountId) -> U128 {
         self.memes_per_owner

@@ -167,4 +167,21 @@ mod test {
             })
         )
     }
+
+    #[test]
+    fn test_add_meme_to_owner() {
+        let context = get_context("ccc.testnet".to_string(), 10000000);
+        testing_env!(context);
+        let mut contract = HusyContract::new_default("ccc.testnet".to_string());
+
+        let user_1 = "aaa.testnet".to_string();
+        let user_2 = "bbb.testnet".to_string();
+
+        contract.add_meme_to_owner(&user_1, &"meme1.testnet".to_string());
+        contract.add_meme_to_owner(&user_1, &"meme2.testnet".to_string());
+        contract.add_meme_to_owner(&user_2, &"meme3.testnet".to_string());
+
+        assert_eq!(contract.memes_per_owner.get(&user_1).unwrap().len(), 2);
+        assert_eq!(contract.memes_per_owner.get(&user_2).unwrap().len(), 1);
+    }
 }

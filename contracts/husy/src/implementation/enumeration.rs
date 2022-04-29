@@ -1,4 +1,4 @@
-use near_sdk::{json_types::U128, near_bindgen};
+use near_sdk::{json_types::U128, near_bindgen, AccountId};
 
 use crate::{
     interface::NFTEnumeration,
@@ -13,7 +13,12 @@ impl NFTEnumeration for HusyContract {
 
     fn nft_tokens(&self, from_index: Option<U128>, limit: Option<u64>) {}
 
-    fn nft_supply_for_owner(&self, account_id: near_sdk::AccountId) {}
+    fn nft_supply_for_owner(&self, account_id: AccountId) -> U128 {
+        self.memes_per_owner
+            .get(&account_id)
+            .map(|memes| U128(memes.len().into()))
+            .unwrap_or(U128(0))
+    }
 
     fn nft_tokens_for_owner(
         &self,
@@ -81,5 +86,21 @@ mod test {
         let result = contract.nft_total_supply();
 
         assert_eq!(result, U128(ids.len() as u128))
+    }
+
+    #[test]
+    fn test_nft_supply_for_owner() {
+        let context = get_context("aaa.testnet".to_string(), 10000000);
+        testing_env!(context);
+        let mut contract = HusyContract::new_default("aaa.testnet".to_string());
+
+        let memes = vec!["aaa".to_string(), "bbb".to_string(), "ccc".to_string()];
+        for meme in &memes {
+            contract.add_meme_to_owner(&"user.testnet".to_string(), meme)
+        }
+
+        let result = contract.nft_supply_for_owner("user.testnet".to_string());
+
+        assert_eq!(result, U128(memes.len() as u128))
     }
 }

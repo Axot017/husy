@@ -66,7 +66,7 @@ pub trait NFTEnumeration {
 
     fn nft_tokens(&self, from_index: Option<U128>, limit: Option<u64>);
 
-    fn nft_supply_for_owner(&self, account_id: AccountId);
+    fn nft_supply_for_owner(&self, account_id: AccountId) -> U128;
 
     fn nft_tokens_for_owner(
         &self,

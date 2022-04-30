@@ -11,8 +11,14 @@ impl NFTEnumeration for HusyContract {
         U128(self.meme_metadata_by_id.len().into())
     }
 
-    fn nft_tokens(&self, from_index: Option<U128>, limit: Option<u64>)  -> Vec<MemeTokenView> {
-        return vec![];
+    fn nft_tokens(&self, from_index: Option<U128>, limit: Option<u64>) -> Vec<MemeTokenView> {
+        self.meme_metadata_by_id
+            .iter()
+            .skip(from_index.unwrap_or(U128(0)).0 as usize)
+            .take(limit.unwrap_or(self.meme_metadata_by_id.len()) as usize)
+            .map(|(key, value)| self.get_meme_view(key, Some(value)))
+            .flatten()
+            .collect()
     }
 
     fn nft_supply_for_owner(&self, account_id: AccountId) -> U128 {
@@ -104,5 +110,141 @@ mod test {
         let result = contract.nft_supply_for_owner("user.testnet".to_string());
 
         assert_eq!(result, U128(memes.len() as u128))
+    }
+
+    #[test]
+    fn full_nft_tokens() {
+        let context = get_context("aaa.testnet".to_string(), 10000000);
+        testing_env!(context);
+        let mut contract = HusyContract::new_default("aaa.testnet".to_string());
+
+        let ids = vec![
+            "a".to_string(),
+            "b".to_string(),
+            "c".to_string(),
+            "d".to_string(),
+        ];
+        let memes = vec![
+            MemeToken {
+                owner_id: "a.testnet".to_string(),
+            },
+            MemeToken {
+                owner_id: "b.testnet".to_string(),
+            },
+            MemeToken {
+                owner_id: "c.testnet".to_string(),
+            },
+            MemeToken {
+                owner_id: "d.testnet".to_string(),
+            },
+        ];
+        let metadatas = vec![
+            MemeTokenMetadata {
+                title: Some("titleA".to_string()),
+                description: Some("descriptionA".to_string()),
+                ..Default::default()
+            },
+            MemeTokenMetadata {
+                title: Some("titleB".to_string()),
+                description: Some("descriptionB".to_string()),
+                ..Default::default()
+            },
+            MemeTokenMetadata {
+                title: Some("titleC".to_string()),
+                description: Some("descriptionC".to_string()),
+                ..Default::default()
+            },
+            MemeTokenMetadata {
+                title: Some("titleD".to_string()),
+                description: Some("descriptionD".to_string()),
+                ..Default::default()
+            },
+        ];
+
+        for i in 0..4 {
+            let id = &ids[i];
+            let meme = &memes[i];
+            let metadata = &metadatas[i];
+            contract.meme_metadata_by_id.insert(id, metadata);
+            contract.memes_by_id.insert(id, meme);
+        }
+
+        let result = contract.nft_tokens(None, None);
+
+        assert_eq!(result.len(), ids.len());
+        for (index, view) in result.iter().enumerate() {
+            assert_eq!(view.metadata, metadatas[index]);
+            assert_eq!(view.owner_id, memes[index].owner_id);
+            assert_eq!(view.token_id, ids[index]);
+        }
+    }
+
+    #[test]
+    fn part_of_nft_tokens() {
+        let context = get_context("aaa.testnet".to_string(), 10000000);
+        testing_env!(context);
+        let mut contract = HusyContract::new_default("aaa.testnet".to_string());
+
+        let ids = vec![
+            "1".to_string(),
+            "2".to_string(),
+            "3".to_string(),
+            "4".to_string(),
+        ];
+        let memes = vec![
+            MemeToken {
+                owner_id: "1.testnet".to_string(),
+            },
+            MemeToken {
+                owner_id: "2.testnet".to_string(),
+            },
+            MemeToken {
+                owner_id: "3.testnet".to_string(),
+            },
+            MemeToken {
+                owner_id: "3.testnet".to_string(),
+            },
+        ];
+        let metadatas = vec![
+            MemeTokenMetadata {
+                title: Some("title1".to_string()),
+                description: Some("description1".to_string()),
+                ..Default::default()
+            },
+            MemeTokenMetadata {
+                title: Some("title2".to_string()),
+                description: Some("description2".to_string()),
+                ..Default::default()
+            },
+            MemeTokenMetadata {
+                title: Some("title3".to_string()),
+                description: Some("description3".to_string()),
+                ..Default::default()
+            },
+            MemeTokenMetadata {
+                title: Some("title4".to_string()),
+                description: Some("description4".to_string()),
+                ..Default::default()
+            },
+        ];
+
+        for i in 0..4 {
+            let id = &ids[i];
+            let meme = &memes[i];
+            let metadata = &metadatas[i];
+            contract.meme_metadata_by_id.insert(id, metadata);
+            contract.memes_by_id.insert(id, meme);
+        }
+        let skipped = 1;
+        let limit = 2;
+
+        let result = contract.nft_tokens(Some(U128(skipped)), Some(limit));
+
+        assert_eq!(result.len(), limit as usize);
+        for (index, view) in result.iter().enumerate() {
+            assert_eq!(view.metadata, metadatas[index + skipped as usize]);
+            assert_eq!(view.owner_id, memes[index + skipped as usize].owner_id);
+            assert_eq!(view.token_id, ids[index + skipped as usize]);
+        }
     }
 }

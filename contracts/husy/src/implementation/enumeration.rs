@@ -34,7 +34,18 @@ impl NFTEnumeration for HusyContract {
         from_index: Option<U128>,
         limit: Option<u64>,
     ) -> Vec<MemeTokenView> {
-        vec![]
+        let memes = match self.memes_per_owner.get(&account_id) {
+            Some(memes) => memes,
+            None => return vec![],
+        };
+
+        memes
+            .iter()
+            .skip(from_index.unwrap_or(U128(0)).0 as usize)
+            .take(limit.unwrap_or(self.meme_metadata_by_id.len()) as usize)
+            .map(|id| self.get_meme_view(id, None))
+            .flatten()
+            .collect()
     }
 }
 
@@ -245,6 +256,101 @@ mod test {
             assert_eq!(view.metadata, metadatas[index + skipped as usize]);
             assert_eq!(view.owner_id, memes[index + skipped as usize].owner_id);
             assert_eq!(view.token_id, ids[index + skipped as usize]);
+        }
+    }
+
+    #[test]
+    fn no_nft_tokens_for_owner() {
+        let context = get_context("aaa.testnet".to_string(), 10000000);
+        testing_env!(context);
+        let contract = HusyContract::new_default("aaa.testnet".to_string());
+
+        let result = contract.nft_tokens_for_owner("some_account.testnet".to_string(), None, None);
+
+        assert_eq!(result, vec![]);
+    }
+
+    #[test]
+    fn show_nft_tokens_for_owner() {
+        let context = get_context("owner.testnet".to_string(), 10000000);
+        testing_env!(context);
+        let mut contract = HusyContract::new_default("owner.testnet".to_string());
+
+        let ids = vec![
+            "memeA".to_string(),
+            "memeB".to_string(),
+            "memeC".to_string(),
+            "memeD".to_string(),
+            "memeE".to_string(),
+        ];
+        let memes = vec![
+            MemeToken {
+                owner_id: "other.testnet".to_string(),
+            },
+            MemeToken {
+                owner_id: "owner.testnet".to_string(),
+            },
+            MemeToken {
+                owner_id: "owner.testnet".to_string(),
+            },
+            MemeToken {
+                owner_id: "owner.testnet".to_string(),
+            },
+            MemeToken {
+                owner_id: "owner.testnet".to_string(),
+            },
+        ];
+        let metadatas = vec![
+            MemeTokenMetadata {
+                title: Some("title0".to_string()),
+                description: Some("description0".to_string()),
+                ..Default::default()
+            },
+            MemeTokenMetadata {
+                title: Some("title1".to_string()),
+                description: Some("description1".to_string()),
+                ..Default::default()
+            },
+            MemeTokenMetadata {
+                title: Some("title2".to_string()),
+                description: Some("description2".to_string()),
+                ..Default::default()
+            },
+            MemeTokenMetadata {
+                title: Some("title3".to_string()),
+                description: Some("description3".to_string()),
+                ..Default::default()
+            },
+            MemeTokenMetadata {
+                title: Some("title4".to_string()),
+                description: Some("description4".to_string()),
+                ..Default::default()
+            },
+        ];
+
+        for i in 0..4 {
+            let id = &ids[i];
+            let meme = &memes[i];
+            let metadata = &metadatas[i];
+            contract.add_meme_to_owner(&meme.owner_id, id);
+            contract.meme_metadata_by_id.insert(id, metadata);
+            contract.memes_by_id.insert(id, meme);
+        }
+        let skipped = 1;
+        let limit = 2;
+
+        let result = contract.nft_tokens_for_owner(
+            "owner.testnet".to_string(),
+            Some(U128(skipped)),
+            Some(limit),
+        );
+
+        assert_eq!(result.len(), limit as usize);
+        for (index, view) in result.iter().enumerate() {
+            // + 1 bacause first meme is owned by different account
+            assert_eq!(view.metadata, metadatas[index + skipped as usize + 1]);
+            assert_eq!(view.owner_id, memes[index + skipped as usize + 1].owner_id);
+            assert_eq!(view.token_id, ids[index + skipped as usize + 1]);
         }
     }
 }

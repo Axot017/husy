@@ -1,10 +1,10 @@
-use near_sdk::{near_bindgen, AccountId};
+use near_sdk::{assert_one_yocto, env, near_bindgen, AccountId};
 
 use crate::{
-    interface::NFTTokenCore,
+    contract::NFTTokenCore,
     models::{
         husy::*,
-        meme::{MemeTokenId, MemeTokenView},
+        meme::{MemeToken, MemeTokenId, MemeTokenView},
     },
 };
 
@@ -31,6 +31,32 @@ impl NFTTokenCore for HusyContract {
         approval_id: Option<u64>,
         memo: Option<String>,
     ) {
+        assert_one_yocto();
+
+        let sender_id = env::predecessor_account_id();
+        let token = self
+            .memes_by_id
+            .get(&token_id)
+            .expect("Token id is invalid");
+
+        assert_eq!(token.owner_id, sender_id, "Unauthorized");
+        assert_ne!(
+            receiver_id, sender_id,
+            "Owner and recievers should be different",
+        );
+
+        self.swap_meme_owner(&sender_id, &receiver_id, &token_id);
+
+        self.memes_by_id.insert(
+            &token_id,
+            &MemeToken {
+                owner_id: receiver_id,
+            },
+        );
+
+        if let Some(memo) = memo {
+            env::log(format!("Memo: {}", memo).as_bytes());
+        }
     }
 
     fn nft_transfer_call(
@@ -63,7 +89,7 @@ impl NFTTokenCore for HusyContract {
 
 #[cfg(test)]
 mod test {
-    use crate::interface::ContractInit;
+    use crate::contract::ContractInit;
     use crate::models::meme::MemeToken;
     use crate::models::meme_metadata::MemeTokenMetadata;
 

@@ -26,6 +26,35 @@ impl HusyContract {
         self.memes_per_owner.insert(owner_id, &owned_memes);
     }
 
+    pub(crate) fn remove_meme_from_owner(&mut self, owner_id: &AccountId, meme_id: &MemeTokenId) {
+        let mut owned_memes = self
+            .memes_per_owner
+            .get(owner_id)
+            .expect(format!("User {} has no memes", owner_id).as_str());
+
+        let result = owned_memes.remove(meme_id);
+
+        if !result {
+            panic!("User {} does not own meme {}", owner_id, meme_id)
+        }
+
+        if owned_memes.is_empty() {
+            self.memes_per_owner.remove(owner_id);
+        } else {
+            self.memes_per_owner.insert(owner_id, &owned_memes);
+        }
+    }
+
+    pub(crate) fn swap_meme_owner(
+        &mut self,
+        owner_id: &AccountId,
+        receiver_id: &AccountId,
+        meme_id: &MemeTokenId,
+    ) {
+        self.remove_meme_from_owner(owner_id, meme_id);
+        self.add_meme_to_owner(receiver_id, meme_id)
+    }
+
     pub(crate) fn get_meme_view(
         &self,
         id: MemeTokenId,
@@ -46,38 +75,24 @@ impl HusyContract {
 
 #[cfg(test)]
 mod test {
-    use crate::interface::ContractInit;
+    use crate::contract::ContractInit;
     use crate::models::meme::MemeToken;
     use crate::models::meme_metadata::MemeTokenMetadata;
 
     use super::*;
+    use near_sdk::test_utils::VMContextBuilder;
     use near_sdk::MockedBlockchain;
     use near_sdk::{testing_env, VMContext};
 
-    fn get_context(predecessor_account_id: String, storage_usage: u64) -> VMContext {
-        VMContext {
-            current_account_id: "current.testnet".to_string(),
-            signer_account_id: "signer.testnet".to_string(),
-            signer_account_pk: vec![0, 1, 2],
-            predecessor_account_id,
-            input: vec![],
-            block_index: 0,
-            block_timestamp: 0,
-            account_balance: 0,
-            account_locked_balance: 0,
-            storage_usage,
-            attached_deposit: 0,
-            prepaid_gas: 10u64.pow(18),
-            random_seed: vec![0, 1, 2],
-            is_view: false,
-            output_data_receivers: vec![],
-            epoch_height: 19,
-        }
+    fn get_context(predecessor_account_id: String) -> VMContext {
+        VMContextBuilder::new()
+            .predecessor_account_id(predecessor_account_id.try_into().unwrap())
+            .build()
     }
 
     #[test]
     fn get_meme_view_with_metadata() {
-        let context = get_context("aaa.testnet".to_string(), 10000000);
+        let context = get_context("aaa.testnet".to_string());
         testing_env!(context);
         let mut contract = HusyContract::new_default("aaa.testnet".to_string());
 
@@ -111,7 +126,7 @@ mod test {
 
     #[test]
     fn get_meme_view_of_not_existing_token() {
-        let context = get_context("bbb.testnet".to_string(), 10000000);
+        let context = get_context("bbb.testnet".to_string());
         testing_env!(context);
         let mut contract = HusyContract::new_default("bbb.testnet".to_string());
 
@@ -137,7 +152,7 @@ mod test {
 
     #[test]
     fn get_meme_view_without_metadata() {
-        let context = get_context("ccc.testnet".to_string(), 10000000);
+        let context = get_context("ccc.testnet".to_string());
         testing_env!(context);
         let mut contract = HusyContract::new_default("ccc.testnet".to_string());
 
@@ -170,7 +185,7 @@ mod test {
 
     #[test]
     fn test_add_meme_to_owner() {
-        let context = get_context("ccc.testnet".to_string(), 10000000);
+        let context = get_context("ccc.testnet".to_string());
         testing_env!(context);
         let mut contract = HusyContract::new_default("ccc.testnet".to_string());
 
@@ -183,5 +198,49 @@ mod test {
 
         assert_eq!(contract.memes_per_owner.get(&user_1).unwrap().len(), 2);
         assert_eq!(contract.memes_per_owner.get(&user_2).unwrap().len(), 1);
+    }
+
+    #[test]
+    fn remove_meme_from_owner_success_one_meme() {
+        let owner_id = "meme_owner.testnet".to_string();
+        let context = get_context(owner_id.clone());
+        testing_env!(context);
+        let mut contract = HusyContract::new_default("contract_owner.testnet".to_string());
+
+        let test_meme_id = "test_meme.testnet".to_string();
+        contract.add_meme_to_owner(&owner_id, &test_meme_id);
+
+        contract.remove_meme_from_owner(&owner_id, &test_meme_id);
+        assert!(contract.memes_per_owner.get(&owner_id).is_none())
+    }
+
+    #[test]
+    fn remove_meme_from_owner_success_multiple_memes() {
+        let owner_id = "bob.testnet".to_string();
+        let context = get_context(owner_id.clone());
+        testing_env!(context);
+        let mut contract = HusyContract::new_default("contract_owner.testnet".to_string());
+
+        let test_meme_id = "test_meme.testnet".to_string();
+        let test_meme_id2 = "test_meme2.testnet".to_string();
+        contract.add_meme_to_owner(&owner_id, &test_meme_id);
+        contract.add_meme_to_owner(&owner_id, &test_meme_id2);
+
+        contract.remove_meme_from_owner(&owner_id, &test_meme_id);
+        assert!(contract.memes_per_owner.get(&owner_id).is_some());
+        assert!(contract.memes_per_owner.get(&owner_id).unwrap().len() == 1);
+    }
+
+    #[test]
+    #[should_panic]
+    fn remove_meme_from_owner_panics() {
+        let owner_id = "some_guy.testnet".to_string();
+        let context = get_context(owner_id.clone());
+        testing_env!(context);
+        let mut contract = HusyContract::new_default("contract_owner.testnet".to_string());
+
+        let test_meme_id = "test_meme.testnet".to_string();
+
+        contract.remove_meme_from_owner(&owner_id, &test_meme_id);
     }
 }

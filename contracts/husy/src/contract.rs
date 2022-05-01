@@ -1,4 +1,4 @@
-use near_sdk::{json_types::U128, AccountId};
+use near_sdk::{json_types::U128, AccountId, PromiseOrValue};
 
 use crate::models::{
     husy_metadata::HusyNFTContractMetadata,
@@ -43,22 +43,7 @@ pub trait NFTTokenCore {
         approval_id: Option<u64>,
         memo: Option<String>,
         msg: String,
-    );
-
-    fn nft_on_transfer(
-        &mut self,
-        sender_id: AccountId,
-        previous_owner_id: AccountId,
-        token_id: MemeTokenId,
-        msg: String,
-    );
-
-    fn nft_resolve_transfer(
-        &mut self,
-        owner_id: AccountId,
-        receiver_id: AccountId,
-        token_id: MemeTokenId,
-    );
+    ) -> PromiseOrValue<bool>;
 }
 
 pub trait NFTEnumeration {

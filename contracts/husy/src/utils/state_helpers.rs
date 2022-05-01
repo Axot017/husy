@@ -1,8 +1,10 @@
-use near_sdk::{borsh::BorshSerialize, collections::UnorderedSet, AccountId};
+use near_sdk::{
+    assert_one_yocto, borsh::BorshSerialize, collections::UnorderedSet, env, AccountId,
+};
 
 use crate::models::{
     husy::*,
-    meme::{MemeTokenId, MemeTokenView},
+    meme::{MemeToken, MemeTokenId, MemeTokenView},
     meme_metadata::MemeTokenMetadata,
     storage::StorageKey,
 };
@@ -70,6 +72,43 @@ impl HusyContract {
             owner_id: token.owner_id,
             token_id: id,
         });
+    }
+
+    pub(crate) fn nft_meme_transfer(
+        &mut self,
+        sender_id: AccountId,
+        receiver_id: AccountId,
+        token_id: MemeTokenId,
+        approval_id: Option<u64>,
+        memo: Option<String>,
+    ) -> MemeToken {
+        assert_one_yocto();
+
+        let token = self
+            .memes_by_id
+            .get(&token_id)
+            .expect("Token id is invalid");
+
+        assert_eq!(token.owner_id, sender_id, "Unauthorized");
+        assert_ne!(
+            receiver_id, sender_id,
+            "Owner and recievers should be different",
+        );
+
+        self.swap_meme_owner(&sender_id, &receiver_id, &token_id);
+
+        self.memes_by_id.insert(
+            &token_id,
+            &MemeToken {
+                owner_id: receiver_id,
+            },
+        );
+
+        if let Some(memo) = memo {
+            env::log(format!("Memo: {}", memo).as_bytes());
+        }
+
+        token // Token before transfer
     }
 }
 

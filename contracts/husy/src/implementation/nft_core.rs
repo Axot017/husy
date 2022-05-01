@@ -1,12 +1,17 @@
-use near_sdk::{assert_one_yocto, env, near_bindgen, AccountId};
+use near_sdk::{env, near_bindgen, AccountId, Balance, Gas, PromiseOrValue};
 
 use crate::{
     contract::NFTTokenCore,
+    ext_contracts::{ext_nft_reciever, ext_self_resolver},
     models::{
         husy::*,
-        meme::{MemeToken, MemeTokenId, MemeTokenView},
+        meme::{MemeTokenId, MemeTokenView},
     },
 };
+
+const GAS_FOR_RESOLVE_TRANSFER: Gas = 10_000_000_000_000;
+const GAS_FOR_NFT_TRANSFER_CALL: Gas = 25_000_000_000_000 + GAS_FOR_RESOLVE_TRANSFER;
+const NO_DEPOSIT: Balance = 0;
 
 #[near_bindgen]
 impl NFTTokenCore for HusyContract {
@@ -31,32 +36,8 @@ impl NFTTokenCore for HusyContract {
         approval_id: Option<u64>,
         memo: Option<String>,
     ) {
-        assert_one_yocto();
-
         let sender_id = env::predecessor_account_id();
-        let token = self
-            .memes_by_id
-            .get(&token_id)
-            .expect("Token id is invalid");
-
-        assert_eq!(token.owner_id, sender_id, "Unauthorized");
-        assert_ne!(
-            receiver_id, sender_id,
-            "Owner and recievers should be different",
-        );
-
-        self.swap_meme_owner(&sender_id, &receiver_id, &token_id);
-
-        self.memes_by_id.insert(
-            &token_id,
-            &MemeToken {
-                owner_id: receiver_id,
-            },
-        );
-
-        if let Some(memo) = memo {
-            env::log(format!("Memo: {}", memo).as_bytes());
-        }
+        self.nft_meme_transfer(sender_id, receiver_id, token_id, approval_id, memo);
     }
 
     fn nft_transfer_call(
@@ -66,24 +47,35 @@ impl NFTTokenCore for HusyContract {
         approval_id: Option<u64>,
         memo: Option<String>,
         msg: String,
-    ) {
-    }
+    ) -> PromiseOrValue<bool> {
+        let sender_id = env::predecessor_account_id();
+        let token = self.nft_meme_transfer(
+            sender_id.clone(),
+            receiver_id.clone(),
+            token_id.clone(),
+            approval_id,
+            memo,
+        );
+        let owner_id = token.owner_id;
 
-    fn nft_on_transfer(
-        &mut self,
-        sender_id: AccountId,
-        previous_owner_id: AccountId,
-        token_id: MemeTokenId,
-        msg: String,
-    ) {
-    }
-
-    fn nft_resolve_transfer(
-        &mut self,
-        owner_id: AccountId,
-        receiver_id: AccountId,
-        token_id: MemeTokenId,
-    ) {
+        ext_nft_reciever::nft_on_transfer(
+            sender_id,
+            owner_id.clone(),
+            token_id.clone(),
+            msg,
+            &receiver_id,
+            NO_DEPOSIT,
+            env::prepaid_gas() - GAS_FOR_NFT_TRANSFER_CALL,
+        )
+        .then(ext_self_resolver::nft_resolve_transfer(
+            owner_id,
+            receiver_id,
+            token_id,
+            &env::current_account_id(),
+            NO_DEPOSIT,
+            GAS_FOR_RESOLVE_TRANSFER,
+        ))
+        .into()
     }
 }
 

@@ -76,7 +76,7 @@ pub trait NFTApproval {
         token_id: MemeTokenId,
         approved_account_id: AccountId,
         approval_id: Option<u64>,
-    );
+    ) -> bool;
 
     fn nft_revoke(&mut self, token_id: MemeTokenId, account_id: AccountId);
 

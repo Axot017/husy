@@ -1,31 +1,138 @@
-use near_sdk::near_bindgen;
+use near_sdk::{env, near_bindgen, AccountId, Balance, Gas};
 
-use crate::{contract::NFTApproval, models::husy::*};
+use crate::{
+    contract::NFTApproval,
+    ext_contracts::ext_nft_approval_receiver,
+    models::{husy::*, meme::MemeTokenId},
+    utils::{asserts::assert_full_access_key, payment::with_storage_payment},
+};
+
+const GAS_FOR_NFT_APPROVE: Gas = 10_000_000_000_000;
+const NO_DEPOSIT: Balance = 0;
 
 #[near_bindgen]
 impl NFTApproval for HusyContract {
-    fn nft_approve(
-        &mut self,
-        token_id: crate::models::meme::MemeTokenId,
-        account_id: near_sdk::AccountId,
-        msg: Option<String>,
-    ) {
+    #[payable]
+    fn nft_approve(&mut self, token_id: MemeTokenId, account_id: AccountId, msg: Option<String>) {
+        assert_full_access_key();
+
+        let mut token = self.memes_by_id.get(&token_id).expect("");
+
+        assert_eq!(
+            &token.owner_id,
+            &env::predecessor_account_id(),
+            "Predecessor must be token owner"
+        );
+
+        let approval_id: u64 = token.next_approval_id;
+        let approved_account_id = account_id.clone();
+        with_storage_payment(|| {
+            token
+                .approved_account_ids
+                .insert(approved_account_id, approval_id);
+
+            token.next_approval_id += 1;
+            self.memes_by_id.insert(&token_id, &token);
+        });
+
+        if let Some(msg) = msg {
+            ext_nft_approval_receiver::nft_on_approve(
+                token_id,
+                token.owner_id,
+                approval_id,
+                msg,
+                &account_id,
+                NO_DEPOSIT,
+                env::prepaid_gas() - GAS_FOR_NFT_APPROVE,
+            )
+            .as_return();
+        }
     }
 
     fn nft_is_approved(
         &self,
-        token_id: crate::models::meme::MemeTokenId,
-        approved_account_id: near_sdk::AccountId,
+        token_id: MemeTokenId,
+        approved_account_id: AccountId,
         approval_id: Option<u64>,
-    ) {
+    ) -> bool {
+        false
     }
 
-    fn nft_revoke(
-        &mut self,
-        token_id: crate::models::meme::MemeTokenId,
-        account_id: near_sdk::AccountId,
-    ) {
+    fn nft_revoke(&mut self, token_id: MemeTokenId, account_id: AccountId) {}
+
+    fn nft_revoke_all(&mut self, token_id: MemeTokenId) {}
+}
+
+#[cfg(test)]
+mod test {
+    use std::collections::HashMap;
+
+    use crate::contract::ContractInit;
+    use crate::models::meme::MemeToken;
+
+    use super::*;
+    use near_sdk::MockedBlockchain;
+    use near_sdk::{test_utils::VMContextBuilder, testing_env, VMContext};
+
+    fn get_context(predecessor_account_id: &str, attached_deposit: u128) -> VMContext {
+        VMContextBuilder::new()
+            .predecessor_account_id(predecessor_account_id.try_into().unwrap())
+            .attached_deposit(attached_deposit)
+            .build()
     }
 
-    fn nft_revoke_all(&mut self, token_id: crate::models::meme::MemeTokenId) {}
+    #[test]
+    #[should_panic]
+    fn nft_approve_panics_when_no_deposit() {
+        let ctx = get_context("test.testnet", 0);
+        testing_env!(ctx);
+        let mut contract = HusyContract::new_default("test.testnet".to_string());
+
+        contract.nft_approve("something".to_string(), "something".to_string(), None);
+    }
+
+    #[test]
+    #[should_panic]
+    fn nft_approve_panics_user_not_owner() {
+        let user_id = "terstes.testnet";
+        let ctx = get_context(user_id, 1000);
+        testing_env!(ctx);
+        let mut contract = HusyContract::new_default("test.testnet".to_string());
+        let token_id = "qweqw.testnet".to_string();
+        contract.memes_by_id.insert(
+            &token_id,
+            &MemeToken {
+                owner_id: "invalid_owner".to_string(),
+                ..Default::default()
+            },
+        );
+
+        contract.nft_approve(token_id, "something".to_string(), None);
+    }
+
+    #[test]
+    fn nft_approve_success() {
+        let user_id = "terstes.testnet";
+        let ctx = get_context(user_id, 10000000000000000000000);
+        testing_env!(ctx);
+        let mut contract = HusyContract::new_default("test.testnet".to_string());
+        let token_id = "qweqw.testnet".to_string();
+        let approved_account_id = "something".to_string();
+
+        contract.memes_by_id.insert(
+            &token_id,
+            &MemeToken {
+                owner_id: user_id.to_string(),
+                ..Default::default()
+            },
+        );
+
+        contract.nft_approve(token_id.clone(), approved_account_id.clone(), None);
+
+        let meme = contract.memes_by_id.get(&token_id).unwrap();
+        let mut expected_map = HashMap::new();
+        expected_map.insert(approved_account_id, 0);
+        assert_eq!(meme.approved_account_ids, expected_map);
+        assert_eq!(meme.next_approval_id, 1);
+    }
 }

@@ -1,7 +1,7 @@
 use near_sdk::{near_bindgen, AccountId};
 
 use crate::{
-    interface::MintNFT,
+    contract::MintNFT,
     models::{husy::*, meme::MemeToken, meme::MemeTokenId, meme_metadata::MemeTokenMetadata},
     utils::payment::with_storage_payment,
 };
@@ -34,7 +34,7 @@ mod test {
     use near_sdk::{testing_env, VMContext};
     use near_sdk::{Balance, MockedBlockchain};
 
-    use crate::interface::ContractInit;
+    use crate::contract::ContractInit;
 
     use super::*;
 

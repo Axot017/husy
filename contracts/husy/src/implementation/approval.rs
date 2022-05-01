@@ -1,6 +1,6 @@
 use near_sdk::near_bindgen;
 
-use crate::{interface::NFTApproval, models::husy::*};
+use crate::{contract::NFTApproval, models::husy::*};
 
 #[near_bindgen]
 impl NFTApproval for HusyContract {

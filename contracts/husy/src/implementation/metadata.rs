@@ -1,6 +1,6 @@
 use near_sdk::near_bindgen;
 
-use crate::interface::NFTContractMetadata;
+use crate::contract::NFTContractMetadata;
 use crate::models::husy::*;
 use crate::models::husy_metadata::HusyNFTContractMetadata;
 
@@ -15,7 +15,7 @@ impl NFTContractMetadata for HusyContract {
 mod test {
     use near_sdk::{testing_env, VMContext};
 
-    use crate::interface::ContractInit;
+    use crate::contract::ContractInit;
     use near_sdk::MockedBlockchain;
 
     use super::*;

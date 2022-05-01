@@ -1,7 +1,7 @@
 use near_sdk::{json_types::U128, near_bindgen, AccountId};
 
 use crate::{
-    interface::NFTEnumeration,
+    contract::NFTEnumeration,
     models::{husy::*, meme::MemeTokenView},
 };
 
@@ -51,7 +51,7 @@ impl NFTEnumeration for HusyContract {
 
 #[cfg(test)]
 mod test {
-    use crate::interface::ContractInit;
+    use crate::contract::ContractInit;
     use crate::models::meme::MemeToken;
     use crate::models::meme_metadata::MemeTokenMetadata;
 

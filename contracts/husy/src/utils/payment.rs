@@ -1,6 +1,6 @@
 use near_sdk::{env, Balance, Promise};
 
-pub(crate) fn with_storage_payment(fun: impl FnOnce()) {
+pub(crate) fn with_storage_refund(fun: impl FnOnce()) {
     let initial_storage_usage = env::storage_usage();
     fun();
     let required_storage = env::storage_usage() - initial_storage_usage;

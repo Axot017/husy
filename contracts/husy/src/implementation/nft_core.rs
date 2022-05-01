@@ -29,6 +29,7 @@ impl NFTTokenCore for HusyContract {
         })
     }
 
+    #[payable]
     fn nft_transfer(
         &mut self,
         receiver_id: AccountId,
@@ -40,6 +41,7 @@ impl NFTTokenCore for HusyContract {
         self.nft_meme_transfer(sender_id, receiver_id, token_id, approval_id, memo);
     }
 
+    #[payable]
     fn nft_transfer_call(
         &mut self,
         receiver_id: AccountId,

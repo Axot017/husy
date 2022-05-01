@@ -25,6 +25,7 @@ impl NFTTokenCore for HusyContract {
                 token_id,
                 owner_id: meme.owner_id,
                 metadata,
+                ..Default::default()
             }
         })
     }
@@ -151,6 +152,7 @@ mod test {
 
         let meme_token = MemeToken {
             owner_id: "aaa.testnet".to_string(),
+            ..Default::default()
         };
         let meme_token_metadata = MemeTokenMetadata {
             title: Some("title".to_string()),
@@ -172,6 +174,7 @@ mod test {
                 token_id: meme_id,
                 owner_id: "aaa.testnet".to_string(),
                 metadata: meme_token_metadata,
+                ..Default::default()
             })
         );
     }

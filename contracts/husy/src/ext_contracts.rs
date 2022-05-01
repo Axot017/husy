@@ -22,3 +22,14 @@ pub trait NFTReciever {
         msg: String,
     ) -> Promise;
 }
+
+#[ext_contract(ext_nft_approval_receiver)]
+trait NonFungibleTokenApprovalsReceiver {
+    fn nft_on_approve(
+        &mut self,
+        token_id: MemeTokenId,
+        owner_id: AccountId,
+        approval_id: u64,
+        msg: String,
+    );
+}

@@ -44,6 +44,13 @@ pub trait NFTTokenCore {
         memo: Option<String>,
         msg: String,
     ) -> PromiseOrValue<bool>;
+
+    fn nft_resolve_transfer(
+        &mut self,
+        owner_id: AccountId,
+        receiver_id: AccountId,
+        token_id: MemeTokenId,
+    ) -> bool;
 }
 
 pub trait NFTEnumeration {

@@ -1,4 +1,4 @@
-use near_sdk::{env, near_bindgen, AccountId, Balance, Gas, PromiseOrValue};
+use near_sdk::{env, near_bindgen, AccountId, Balance, Gas, PromiseOrValue, PromiseResult};
 
 use crate::{
     contract::NFTTokenCore,
@@ -76,6 +76,37 @@ impl NFTTokenCore for HusyContract {
             GAS_FOR_RESOLVE_TRANSFER,
         ))
         .into()
+    }
+
+    #[private]
+    fn nft_resolve_transfer(
+        &mut self,
+        owner_id: AccountId,
+        receiver_id: AccountId,
+        token_id: MemeTokenId,
+    ) -> bool {
+        if let PromiseResult::Successful(value) = env::promise_result(0) {
+            if let Ok(return_token) = near_sdk::serde_json::from_slice::<bool>(&value) {
+                if !return_token {
+                    return true;
+                }
+            }
+        }
+
+        let mut token = match self.memes_by_id.get(&token_id) {
+            Some(token) => token,
+            None => return true,
+        };
+
+        if token.owner_id != receiver_id {
+            return true;
+        }
+
+        token.owner_id = owner_id.clone();
+        self.memes_by_id.insert(&token_id, &token);
+        self.swap_meme_owner(&receiver_id, &owner_id, &token_id);
+
+        false
     }
 }
 

@@ -71,6 +71,7 @@ impl HusyContract {
             metadata,
             owner_id: token.owner_id,
             token_id: id,
+            ..Default::default()
         });
     }
 
@@ -101,6 +102,7 @@ impl HusyContract {
             &token_id,
             &MemeToken {
                 owner_id: receiver_id,
+                ..Default::default()
             },
         );
 
@@ -137,6 +139,7 @@ mod test {
 
         let meme_token = MemeToken {
             owner_id: "aaa.testnet".to_string(),
+            ..Default::default()
         };
         let meme_token_metadata = MemeTokenMetadata {
             title: Some("title".to_string()),
@@ -159,6 +162,7 @@ mod test {
                 metadata: meme_token_metadata,
                 owner_id: "aaa.testnet".to_string(),
                 token_id: "id.testnet".to_string(),
+                ..Default::default()
             })
         )
     }
@@ -171,6 +175,7 @@ mod test {
 
         let meme_token = MemeToken {
             owner_id: "aaa.testnet".to_string(),
+            ..Default::default()
         };
         let meme_token_metadata = MemeTokenMetadata {
             title: Some("title".to_string()),
@@ -197,6 +202,7 @@ mod test {
 
         let meme_token = MemeToken {
             owner_id: "ccc.testnet".to_string(),
+            ..Default::default()
         };
         let meme_token_metadata = MemeTokenMetadata {
             title: Some("title".to_string()),
@@ -218,6 +224,7 @@ mod test {
                 metadata: meme_token_metadata,
                 owner_id: "ccc.testnet".to_string(),
                 token_id: "bb.testnet".to_string(),
+                ..Default::default()
             })
         )
     }

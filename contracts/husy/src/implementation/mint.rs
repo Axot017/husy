@@ -18,6 +18,7 @@ impl MintNFT for HusyContract {
         with_storage_payment(|| {
             let meme = MemeToken {
                 owner_id: receiver_id,
+                ..Default::default()
             };
             assert!(
                 self.memes_by_id.insert(&token_id, &meme).is_none(),
@@ -84,6 +85,7 @@ mod test {
             contract.memes_by_id.get(&token_id),
             Some(MemeToken {
                 owner_id: receiver_id.clone(),
+                ..Default::default()
             })
         );
         assert_eq!(

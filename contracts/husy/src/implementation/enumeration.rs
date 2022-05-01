@@ -88,6 +88,7 @@ mod test {
 
         let meme_token = MemeToken {
             owner_id: "aaa.testnet".to_string(),
+            ..Default::default()
         };
         let meme_token_metadata = MemeTokenMetadata {
             title: Some("title".to_string()),
@@ -138,15 +139,19 @@ mod test {
         let memes = vec![
             MemeToken {
                 owner_id: "a.testnet".to_string(),
+                ..Default::default()
             },
             MemeToken {
                 owner_id: "b.testnet".to_string(),
+                ..Default::default()
             },
             MemeToken {
                 owner_id: "c.testnet".to_string(),
+                ..Default::default()
             },
             MemeToken {
                 owner_id: "d.testnet".to_string(),
+                ..Default::default()
             },
         ];
         let metadatas = vec![
@@ -205,15 +210,19 @@ mod test {
         let memes = vec![
             MemeToken {
                 owner_id: "1.testnet".to_string(),
+                ..Default::default()
             },
             MemeToken {
                 owner_id: "2.testnet".to_string(),
+                ..Default::default()
             },
             MemeToken {
                 owner_id: "3.testnet".to_string(),
+                ..Default::default()
             },
             MemeToken {
                 owner_id: "3.testnet".to_string(),
+                ..Default::default()
             },
         ];
         let metadatas = vec![
@@ -286,18 +295,23 @@ mod test {
         let memes = vec![
             MemeToken {
                 owner_id: "other.testnet".to_string(),
+                ..Default::default()
             },
             MemeToken {
                 owner_id: "owner.testnet".to_string(),
+                ..Default::default()
             },
             MemeToken {
                 owner_id: "owner.testnet".to_string(),
+                ..Default::default()
             },
             MemeToken {
                 owner_id: "owner.testnet".to_string(),
+                ..Default::default()
             },
             MemeToken {
                 owner_id: "owner.testnet".to_string(),
+                ..Default::default()
             },
         ];
         let metadatas = vec![

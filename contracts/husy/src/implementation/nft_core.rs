@@ -25,7 +25,7 @@ impl NFTTokenCore for HusyContract {
                 token_id,
                 owner_id: meme.owner_id,
                 metadata,
-                ..Default::default()
+                approved_account_ids: meme.approved_account_ids,
             }
         })
     }

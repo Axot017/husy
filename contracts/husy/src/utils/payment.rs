@@ -1,4 +1,6 @@
-use near_sdk::{env, Balance, Promise};
+use std::mem::size_of;
+
+use near_sdk::{env, AccountId, Balance, Promise};
 
 pub(crate) fn with_storage_refund(fun: impl FnOnce()) {
     let initial_storage_usage = env::storage_usage();

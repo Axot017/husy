@@ -55,7 +55,16 @@ impl NFTApproval for HusyContract {
         approved_account_id: AccountId,
         approval_id: Option<u64>,
     ) -> bool {
-        false
+        let token = self.memes_by_id.get(&token_id).expect("Invalid token id");
+
+        match (
+            token.approved_account_ids.get(&approved_account_id),
+            approval_id,
+        ) {
+            (Some(expected_approval_id), Some(approval_id)) => expected_approval_id == &approval_id,
+            (Some(_), None) => true,
+            (None, _) => false,
+        }
     }
 
     fn nft_revoke(&mut self, token_id: MemeTokenId, account_id: AccountId) {}
@@ -79,6 +88,72 @@ mod test {
             .predecessor_account_id(predecessor_account_id.try_into().unwrap())
             .attached_deposit(attached_deposit)
             .build()
+    }
+
+    #[test]
+    #[should_panic]
+    fn nft_is_approved_panic() {
+        let account_id = "acbvbcvbc.testnet".to_string();
+        let ctx = get_context(&account_id, 0);
+        testing_env!(ctx);
+        let contract = HusyContract::new_default(account_id.clone());
+
+        contract.nft_is_approved(
+            "some_token.testnet".to_string(),
+            "some_account".to_string(),
+            None,
+        );
+    }
+
+    #[test]
+    fn nft_is_approved_success() {
+        let account_id = "asdfasd.testnet".to_string();
+        let owner_id = "asdfasdfasdffds.testnet".to_string();
+        let ctx = get_context(&account_id, 0);
+        testing_env!(ctx);
+        let mut contract = HusyContract::new_default(owner_id.clone());
+
+        contract.memes_by_id.insert(
+            &"not_approved.testnet".to_string(),
+            &MemeToken {
+                approved_account_ids: HashMap::new(),
+                next_approval_id: 0,
+                owner_id: owner_id.clone(),
+            },
+        );
+        contract.memes_by_id.insert(
+            &"approved.testnet".to_string(),
+            &MemeToken {
+                approved_account_ids: HashMap::from([(account_id.clone(), 2)]),
+                next_approval_id: 3,
+                owner_id: owner_id.clone(),
+            },
+        );
+
+        assert_eq!(
+            contract.nft_is_approved("not_approved.testnet".to_string(), account_id.clone(), None),
+            false
+        );
+        assert_eq!(
+            contract.nft_is_approved(
+                "approved.testnet".to_string(),
+                "not_owner.testnet".to_string(),
+                None
+            ),
+            false
+        );
+        assert_eq!(
+            contract.nft_is_approved("approved.testnet".to_string(), account_id.clone(), Some(1)),
+            false
+        );
+        assert_eq!(
+            contract.nft_is_approved("approved.testnet".to_string(), account_id.clone(), None),
+            true
+        );
+        assert_eq!(
+            contract.nft_is_approved("approved.testnet".to_string(), account_id.clone(), Some(2)),
+            true
+        );
     }
 
     #[test]

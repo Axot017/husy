@@ -71,7 +71,7 @@ impl HusyContract {
             metadata,
             owner_id: token.owner_id,
             token_id: id,
-            ..Default::default()
+            approved_account_ids: token.approved_account_ids,
         });
     }
 

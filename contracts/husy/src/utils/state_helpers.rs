@@ -90,6 +90,20 @@ impl HusyContract {
             .get(&token_id)
             .expect("Token id is invalid");
 
+        if token.owner_id != sender_id {
+            if !token.approved_account_ids.contains_key(&sender_id) {
+                panic!("Unauthorized")
+            }
+            match token.approved_account_ids.get(&sender_id) {
+                Some(expected_approval_id) => {
+                    if let Some(approval_id) = approval_id {
+                        assert_eq!(&approval_id, expected_approval_id, "Sender is not approved")
+                    }
+                }
+                None => panic!("Unauthorized"),
+            }
+        }
+
         assert_eq!(token.owner_id, sender_id, "Unauthorized");
         assert_ne!(
             receiver_id, sender_id,
@@ -102,6 +116,7 @@ impl HusyContract {
             &token_id,
             &MemeToken {
                 owner_id: receiver_id,
+                next_approval_id: token.next_approval_id,
                 ..Default::default()
             },
         );

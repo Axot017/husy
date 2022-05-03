@@ -6,6 +6,7 @@ use crate::models::{
     husy_metadata::HusyNFTContractMetadata,
     meme::{MemeTokenId, MemeTokenView},
     meme_metadata::MemeTokenMetadata,
+    payout::Payout,
 };
 
 pub trait ContractInit {
@@ -84,4 +85,18 @@ pub trait NFTApproval {
     fn nft_revoke(&mut self, token_id: MemeTokenId, account_id: AccountId);
 
     fn nft_revoke_all(&mut self, token_id: MemeTokenId);
+}
+
+pub trait NFTRoyality {
+    fn nft_payout(&self, token_id: MemeTokenId, balance: U128, max_len_payout: u32) -> Payout;
+
+    fn nft_transfer_payout(
+        &mut self,
+        receiver_id: AccountId,
+        token_id: MemeTokenId,
+        approval_id: u64,
+        memo: Option<String>,
+        balance: U128,
+        max_len_payout: u32,
+    ) -> Payout;
 }

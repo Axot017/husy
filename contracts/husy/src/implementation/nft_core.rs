@@ -1,4 +1,5 @@
 use near_sdk::{env, near_bindgen, AccountId, Balance, Gas, PromiseOrValue, PromiseResult};
+use std::collections::HashMap;
 
 use crate::{
     contract::NFTTokenCore,
@@ -7,7 +8,7 @@ use crate::{
         husy::*,
         meme::{MemeTokenId, MemeTokenView},
     },
-    utils::payment::with_refund,
+    utils::payment::{refund_approved_account_ids, with_refund},
 };
 
 const GAS_FOR_RESOLVE_TRANSFER: Gas = 10_000_000_000_000;
@@ -40,7 +41,9 @@ impl NFTTokenCore for HusyContract {
         memo: Option<String>,
     ) {
         let sender_id = env::predecessor_account_id();
-        self.nft_meme_transfer(sender_id, receiver_id, token_id, approval_id, memo);
+        with_refund(|| {
+            self.nft_meme_transfer(sender_id, receiver_id, token_id, approval_id, memo);
+        })
     }
 
     #[payable]
@@ -53,15 +56,13 @@ impl NFTTokenCore for HusyContract {
         msg: String,
     ) -> PromiseOrValue<bool> {
         let sender_id = env::predecessor_account_id();
-        let token = with_refund(|| {
-            self.nft_meme_transfer(
-                sender_id.clone(),
-                receiver_id.clone(),
-                token_id.clone(),
-                approval_id,
-                memo,
-            )
-        });
+        let token = self.nft_meme_transfer(
+            sender_id.clone(),
+            receiver_id.clone(),
+            token_id.clone(),
+            approval_id,
+            memo,
+        );
         let owner_id = token.owner_id;
 
         ext_nft_reciever::nft_on_transfer(
@@ -77,6 +78,7 @@ impl NFTTokenCore for HusyContract {
             owner_id,
             receiver_id,
             token_id,
+            token.approved_account_ids,
             &env::current_account_id(),
             NO_DEPOSIT,
             GAS_FOR_RESOLVE_TRANSFER,
@@ -90,10 +92,12 @@ impl NFTTokenCore for HusyContract {
         owner_id: AccountId,
         receiver_id: AccountId,
         token_id: MemeTokenId,
+        approved_account_ids: HashMap<AccountId, u64>,
     ) -> bool {
         if let PromiseResult::Successful(value) = env::promise_result(0) {
             if let Ok(return_token) = near_sdk::serde_json::from_slice::<bool>(&value) {
                 if !return_token {
+                    refund_approved_account_ids(owner_id, &approved_account_ids);
                     return true;
                 }
             }
@@ -101,16 +105,22 @@ impl NFTTokenCore for HusyContract {
 
         let mut token = match self.memes_by_id.get(&token_id) {
             Some(token) => token,
-            None => return true,
+            None => {
+                refund_approved_account_ids(owner_id, &approved_account_ids);
+                return true;
+            }
         };
 
         if token.owner_id != receiver_id {
+            refund_approved_account_ids(owner_id, &approved_account_ids);
             return true;
         }
 
         token.owner_id = owner_id.clone();
         self.memes_by_id.insert(&token_id, &token);
         self.swap_meme_owner(&receiver_id, &owner_id, &token_id);
+
+        refund_approved_account_ids(receiver_id, &token.approved_account_ids);
 
         false
     }

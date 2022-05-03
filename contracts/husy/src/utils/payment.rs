@@ -1,4 +1,6 @@
-use near_sdk::{env, Balance, Promise};
+use std::{collections::HashMap, mem::size_of};
+
+use near_sdk::{env, AccountId, Balance, Promise};
 
 pub(crate) fn with_refund<F, R>(fun: F) -> R
 where
@@ -27,4 +29,16 @@ where
     }
 
     result
+}
+
+pub(crate) fn bytes_for_account_id(account_id: &AccountId) -> u64 {
+    account_id.as_str().len() as u64 + 4 + size_of::<u64>() as u64
+}
+
+pub(crate) fn refund_approved_account_ids(
+    account_id: AccountId,
+    approved_account_ids: &HashMap<AccountId, u64>,
+) -> Promise {
+    let storage_released: u64 = approved_account_ids.keys().map(bytes_for_account_id).sum();
+    Promise::new(account_id).transfer(Balance::from(storage_released) * env::storage_byte_cost())
 }

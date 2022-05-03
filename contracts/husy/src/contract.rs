@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use near_sdk::{json_types::U128, AccountId, PromiseOrValue};
 
 use crate::models::{
@@ -50,6 +52,7 @@ pub trait NFTTokenCore {
         owner_id: AccountId,
         receiver_id: AccountId,
         token_id: MemeTokenId,
+        approved_account_ids: HashMap<AccountId, u64>,
     ) -> bool;
 }
 

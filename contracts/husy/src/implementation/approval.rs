@@ -81,7 +81,20 @@ impl NFTApproval for HusyContract {
         });
     }
 
-    fn nft_revoke_all(&mut self, token_id: MemeTokenId) {}
+    fn nft_revoke_all(&mut self, token_id: MemeTokenId) {
+        let mut token = self.memes_by_id.get(&token_id).expect("Invalid token id");
+
+        assert_eq!(
+            &token.owner_id,
+            &env::predecessor_account_id(),
+            "Unauthorized"
+        );
+
+        with_refund(|| {
+            token.approved_account_ids.clear();
+            self.memes_by_id.insert(&token_id, &token);
+        })
+    }
 }
 
 #[cfg(test)]
@@ -100,6 +113,67 @@ mod test {
             .predecessor_account_id(predecessor_account_id.try_into().unwrap())
             .attached_deposit(attached_deposit)
             .build()
+    }
+
+    #[test]
+    fn nft_revoke_all_success() {
+        let account_id = "acbvbcvbc.testnet".to_string();
+        let ctx = get_context(&account_id, 0);
+        testing_env!(ctx);
+        let mut contract = HusyContract::new_default(account_id.clone());
+        let token_id = "asdfzvczx.testnet".to_string();
+        contract.memes_by_id.insert(
+            &token_id,
+            &MemeToken {
+                owner_id: account_id.clone(),
+                approved_account_ids: HashMap::from([
+                    ("account1.testnet".to_string(), 0),
+                    ("account2.testnet".to_string(), 1),
+                    ("account3.testnet".to_string(), 2),
+                    ("account4.testnet".to_string(), 3),
+                ]),
+                next_approval_id: 4,
+            },
+        );
+
+        contract.nft_revoke_all(token_id.clone());
+
+        assert!(contract
+            .memes_by_id
+            .get(&token_id)
+            .unwrap()
+            .approved_account_ids
+            .is_empty());
+    }
+
+    #[test]
+    #[should_panic]
+    fn nft_revoke_all_panic_when_unauthorized() {
+        let account_id = "acbvbcvbc.testnet".to_string();
+        let ctx = get_context(&account_id, 0);
+        testing_env!(ctx);
+        let mut contract = HusyContract::new_default(account_id.clone());
+        let token_id = "asdfzvczx.testnet".to_string();
+        contract.memes_by_id.insert(
+            &token_id,
+            &MemeToken {
+                owner_id: "unauthorized.testnet".to_string(),
+                ..Default::default()
+            },
+        );
+
+        contract.nft_revoke_all(token_id)
+    }
+
+    #[test]
+    #[should_panic]
+    fn nft_revoke_all_panic_when_invalid_token_id() {
+        let account_id = "acbvbcvbc.testnet".to_string();
+        let ctx = get_context(&account_id, 0);
+        testing_env!(ctx);
+        let mut contract = HusyContract::new_default(account_id.clone());
+
+        contract.nft_revoke_all("invalid_token_id.testnet".to_string())
     }
 
     #[test]

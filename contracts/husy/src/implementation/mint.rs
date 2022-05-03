@@ -3,7 +3,7 @@ use near_sdk::{near_bindgen, AccountId};
 use crate::{
     contract::MintNFT,
     models::{husy::*, meme::MemeToken, meme::MemeTokenId, meme_metadata::MemeTokenMetadata},
-    utils::payment::with_storage_refund,
+    utils::payment::with_refund,
 };
 
 #[near_bindgen]
@@ -15,7 +15,7 @@ impl MintNFT for HusyContract {
         token_metadata: MemeTokenMetadata,
         receiver_id: AccountId,
     ) {
-        with_storage_refund(|| {
+        with_refund(|| {
             let meme = MemeToken {
                 owner_id: receiver_id,
                 ..Default::default()

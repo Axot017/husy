@@ -4,7 +4,7 @@ use crate::{
     contract::NFTApproval,
     ext_contracts::ext_nft_approval_receiver,
     models::{husy::*, meme::MemeTokenId},
-    utils::{asserts::assert_full_access_key, payment::with_storage_refund},
+    utils::{asserts::assert_full_access_key, payment::with_refund},
 };
 
 const GAS_FOR_NFT_APPROVE: Gas = 10_000_000_000_000;
@@ -26,7 +26,7 @@ impl NFTApproval for HusyContract {
 
         let approval_id: u64 = token.next_approval_id;
         let approved_account_id = account_id.clone();
-        with_storage_refund(|| {
+        with_refund(|| {
             token
                 .approved_account_ids
                 .insert(approved_account_id, approval_id);

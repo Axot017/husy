@@ -7,6 +7,7 @@ use crate::{
         husy::*,
         meme::{MemeTokenId, MemeTokenView},
     },
+    utils::payment::with_refund,
 };
 
 const GAS_FOR_RESOLVE_TRANSFER: Gas = 10_000_000_000_000;
@@ -52,13 +53,15 @@ impl NFTTokenCore for HusyContract {
         msg: String,
     ) -> PromiseOrValue<bool> {
         let sender_id = env::predecessor_account_id();
-        let token = self.nft_meme_transfer(
-            sender_id.clone(),
-            receiver_id.clone(),
-            token_id.clone(),
-            approval_id,
-            memo,
-        );
+        let token = with_refund(|| {
+            self.nft_meme_transfer(
+                sender_id.clone(),
+                receiver_id.clone(),
+                token_id.clone(),
+                approval_id,
+                memo,
+            )
+        });
         let owner_id = token.owner_id;
 
         ext_nft_reciever::nft_on_transfer(

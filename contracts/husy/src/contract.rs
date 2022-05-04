@@ -25,6 +25,7 @@ pub trait MintNFT {
         token_id: MemeTokenId,
         token_metadata: MemeTokenMetadata,
         receiver_id: AccountId,
+        royalties: Option<HashMap<AccountId, u32>>,
     );
 }
 

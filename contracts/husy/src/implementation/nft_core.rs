@@ -18,19 +18,7 @@ const NO_DEPOSIT: Balance = 0;
 #[near_bindgen]
 impl NFTTokenCore for HusyContract {
     fn nft_token(&self, token_id: MemeTokenId) -> Option<MemeTokenView> {
-        self.memes_by_id.get(&token_id).map(|meme| {
-            let metadata = self
-                .meme_metadata_by_id
-                .get(&token_id)
-                .expect("Falied to get metadata");
-            MemeTokenView {
-                token_id,
-                owner_id: meme.owner_id,
-                metadata,
-                approved_account_ids: meme.approved_account_ids,
-                royalty: meme.royalty,
-            }
-        })
+        self.get_meme_view(token_id, None)
     }
 
     #[payable]

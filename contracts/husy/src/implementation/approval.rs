@@ -133,6 +133,7 @@ mod test {
                     ("account4.testnet".to_string(), 3),
                 ]),
                 next_approval_id: 4,
+                ..Default::default()
             },
         );
 
@@ -190,6 +191,7 @@ mod test {
                 owner_id: account_id.clone(),
                 approved_account_ids: HashMap::from([(approved_account_id.clone(), 0)]),
                 next_approval_id: 1,
+                ..Default::default()
             },
         );
 
@@ -265,6 +267,7 @@ mod test {
                 approved_account_ids: HashMap::new(),
                 next_approval_id: 0,
                 owner_id: owner_id.clone(),
+                ..Default::default()
             },
         );
         contract.memes_by_id.insert(
@@ -273,6 +276,7 @@ mod test {
                 approved_account_ids: HashMap::from([(account_id.clone(), 2)]),
                 next_approval_id: 3,
                 owner_id: owner_id.clone(),
+                ..Default::default()
             },
         );
 

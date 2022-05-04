@@ -15,6 +15,7 @@ pub struct MemeToken {
     pub owner_id: AccountId,
     pub approved_account_ids: HashMap<AccountId, u64>,
     pub next_approval_id: u64,
+    pub royalty: HashMap<AccountId, u32>,
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Clone, Default, Debug)]
@@ -24,4 +25,5 @@ pub struct MemeTokenView {
     pub owner_id: AccountId,
     pub metadata: MemeTokenMetadata,
     pub approved_account_ids: HashMap<AccountId, u64>,
+    pub royalty: HashMap<AccountId, u32>,
 }

@@ -72,6 +72,7 @@ impl HusyContract {
             owner_id: token.owner_id,
             token_id: id,
             approved_account_ids: token.approved_account_ids,
+            royalty: token.royalty,
         });
     }
 
@@ -131,6 +132,8 @@ impl HusyContract {
 
 #[cfg(test)]
 mod test {
+    use std::collections::HashMap;
+
     use crate::contract::ContractInit;
     use crate::models::meme::MemeToken;
     use crate::models::meme_metadata::MemeTokenMetadata;
@@ -154,7 +157,9 @@ mod test {
 
         let meme_token = MemeToken {
             owner_id: "aaa.testnet".to_string(),
-            ..Default::default()
+            approved_account_ids: HashMap::from([("approved.testnet".to_string(), 0)]),
+            next_approval_id: 1,
+            royalty: HashMap::from([("royality.testnet".to_string(), 1000)]),
         };
         let meme_token_metadata = MemeTokenMetadata {
             title: Some("title".to_string()),
@@ -177,7 +182,8 @@ mod test {
                 metadata: meme_token_metadata,
                 owner_id: "aaa.testnet".to_string(),
                 token_id: "id.testnet".to_string(),
-                ..Default::default()
+                approved_account_ids: HashMap::from([("approved.testnet".to_string(), 0)]),
+                royalty: HashMap::from([("royality.testnet".to_string(), 1000)]),
             })
         )
     }

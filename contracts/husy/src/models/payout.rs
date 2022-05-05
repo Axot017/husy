@@ -6,7 +6,7 @@ use near_sdk::{
     AccountId,
 };
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
 #[serde(crate = "near_sdk::serde")]
 pub struct Payout {
     pub payout: HashMap<AccountId, U128>,

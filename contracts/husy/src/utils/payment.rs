@@ -2,7 +2,7 @@ use std::{collections::HashMap, mem::size_of};
 
 use near_sdk::{env, AccountId, Balance, Promise};
 
-pub(crate) fn with_refund<F, R>(fun: F) -> R
+pub(crate) fn with_refund<F, R>(fun: F, reveiver_id: Option<AccountId>) -> R
 where
     F: FnOnce() -> R,
 {
@@ -25,7 +25,8 @@ where
     };
 
     if refund > 0 {
-        Promise::new(env::predecessor_account_id()).transfer(refund);
+        let receiver_id = reveiver_id.unwrap_or(env::predecessor_account_id());
+        Promise::new(receiver_id).transfer(refund);
     }
 
     result

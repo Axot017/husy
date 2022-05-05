@@ -1,38 +1,14 @@
-use std::collections::HashMap;
-
-use near_sdk::{json_types::U128, AccountId};
+use near_sdk::{env, json_types::U128, AccountId};
 
 use crate::{
     contract::NFTRoyality,
     models::{husy::*, meme::MemeTokenId, payout::Payout},
-    utils::calculation::calculate_procentage,
+    utils::payment::with_refund,
 };
 
 impl NFTRoyality for HusyContract {
     fn nft_payout(&self, token_id: MemeTokenId, balance: U128, max_len_payout: u32) -> Payout {
-        let token = self.memes_by_id.get(&token_id).expect("Invalid token id");
-        assert!(
-            token.royalty.len() as u32 + 1 <= max_len_payout,
-            "Market cannot payout to that many receivers"
-        );
-
-        let mut payout: HashMap<String, U128> = token
-            .royalty
-            .iter()
-            .filter(|(key, _a)| *key != &token.owner_id)
-            .map(|(key, value)| {
-                (
-                    key.to_owned(),
-                    U128(calculate_procentage(value.to_owned(), balance.into())),
-                )
-            })
-            .collect();
-
-        let owner_payout = balance.0 - payout.values().map(|value| value.0).sum::<u128>();
-
-        payout.insert(token.owner_id, U128(owner_payout));
-
-        Payout { payout }
+        self.get_meme_payout(token_id, balance, max_len_payout)
     }
 
     fn nft_transfer_payout(
@@ -44,12 +20,29 @@ impl NFTRoyality for HusyContract {
         balance: U128,
         max_len_payout: u32,
     ) -> Payout {
-        todo!()
+        let sender_id = env::predecessor_account_id();
+        let meme = self.memes_by_id.get(&token_id).expect("Meme not found");
+
+        with_refund(
+            || {
+                self.nft_meme_transfer(
+                    sender_id,
+                    receiver_id,
+                    token_id.clone(),
+                    Some(approval_id),
+                    memo,
+                );
+                self.get_meme_payout(token_id, balance, max_len_payout)
+            },
+            Some(meme.owner_id),
+        )
     }
 }
 
 #[cfg(test)]
 mod test {
+    use std::collections::HashMap;
+
     use super::*;
     use near_sdk::MockedBlockchain;
     use near_sdk::{test_utils::VMContextBuilder, testing_env, VMContext};

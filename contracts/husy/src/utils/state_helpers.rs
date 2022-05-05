@@ -1,13 +1,15 @@
+use std::collections::HashMap;
+
 use near_sdk::{
-    assert_one_yocto, borsh::BorshSerialize, collections::UnorderedSet, env, AccountId,
+    assert_one_yocto, borsh::BorshSerialize, collections::UnorderedSet, env, AccountId, json_types::U128,
 };
 
-use crate::models::{
+use crate::{models::{
     husy::*,
     meme::{MemeToken, MemeTokenId, MemeTokenView},
     meme_metadata::MemeTokenMetadata,
-    storage::StorageKey,
-};
+    storage::StorageKey, payout::Payout,
+}, utils::calculation::calculate_procentage};
 
 use super::hashing::hash_account_id;
 
@@ -127,6 +129,37 @@ impl HusyContract {
         }
 
         token // Token before transfer
+    }
+
+    pub(crate) fn get_meme_payout(
+        &self,
+        token_id: MemeTokenId,
+        balance: U128,
+        max_len_payout: u32,
+    ) -> Payout {
+        let token = self.memes_by_id.get(&token_id).expect("Invalid token id");
+        assert!(
+            token.royalty.len() as u32 + 1 <= max_len_payout,
+            "Market cannot payout to that many receivers"
+        );
+
+        let mut payout: HashMap<String, U128> = token
+            .royalty
+            .iter()
+            .filter(|(key, _a)| *key != &token.owner_id)
+            .map(|(key, value)| {
+                (
+                    key.to_owned(),
+                    U128(calculate_procentage(value.to_owned(), balance.into())),
+                )
+            })
+            .collect();
+
+        let owner_payout = balance.0 - payout.values().map(|value| value.0).sum::<u128>();
+
+        payout.insert(token.owner_id, U128(owner_payout));
+
+        Payout { payout }
     }
 }
 

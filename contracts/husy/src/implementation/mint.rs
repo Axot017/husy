@@ -41,7 +41,7 @@ impl MintNFT for HusyContract {
 
             self.meme_metadata_by_id.insert(&token_id, &token_metadata);
             self.add_meme_to_owner(&meme.owner_id, &token_id)
-        });
+        }, None);
     }
 }
 

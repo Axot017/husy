@@ -7,7 +7,7 @@ use near_sdk::{
 use super::{
     husy_metadata::HusyNFTContractMetadata,
     meme::{MemeToken, MemeTokenId},
-    meme_metadata::MemeTokenMetadata,
+    meme_metadata::MemeTokenMetadata, global_likes_data::GlobalLikesData,
 };
 
 #[near_bindgen]
@@ -18,4 +18,5 @@ pub struct HusyContract {
     pub memes_by_id: LookupMap<MemeTokenId, MemeToken>,
     pub meme_metadata_by_id: UnorderedMap<MemeTokenId, MemeTokenMetadata>,
     pub metadata: LazyOption<HusyNFTContractMetadata>,
+    pub likes_data: LazyOption<GlobalLikesData>,
 }

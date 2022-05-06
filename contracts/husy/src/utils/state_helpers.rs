@@ -1,15 +1,20 @@
 use std::collections::HashMap;
 
 use near_sdk::{
-    assert_one_yocto, borsh::BorshSerialize, collections::UnorderedSet, env, AccountId, json_types::U128,
+    assert_one_yocto, borsh::BorshSerialize, collections::UnorderedSet, env, json_types::U128,
+    AccountId,
 };
 
-use crate::{models::{
-    husy::*,
-    meme::{MemeToken, MemeTokenId, MemeTokenView},
-    meme_metadata::MemeTokenMetadata,
-    storage::StorageKey, payout::Payout,
-}, utils::calculation::calculate_procentage};
+use crate::{
+    models::{
+        husy::*,
+        meme::{MemeToken, MemeTokenId, MemeTokenView},
+        meme_metadata::MemeTokenMetadata,
+        payout::Payout,
+        storage::StorageKey,
+    },
+    utils::calculation::calculate_procentage,
+};
 
 use super::hashing::hash_account_id;
 
@@ -75,6 +80,7 @@ impl HusyContract {
             token_id: id,
             approved_account_ids: token.approved_account_ids,
             royalty: token.royalty,
+            likes: token.likes,
         });
     }
 
@@ -193,6 +199,9 @@ mod test {
             approved_account_ids: HashMap::from([("approved.testnet".to_string(), 0)]),
             next_approval_id: 1,
             royalty: HashMap::from([("royality.testnet".to_string(), 1000)]),
+            likes: 1,
+            showed_on_main: false,
+            last_counted_like_timestamp: 0,
         };
         let meme_token_metadata = MemeTokenMetadata {
             title: Some("title".to_string()),
@@ -217,6 +226,7 @@ mod test {
                 token_id: "id.testnet".to_string(),
                 approved_account_ids: HashMap::from([("approved.testnet".to_string(), 0)]),
                 royalty: HashMap::from([("royality.testnet".to_string(), 1000)]),
+                likes: 1,
             })
         )
     }

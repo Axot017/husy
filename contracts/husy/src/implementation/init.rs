@@ -3,6 +3,7 @@ use near_sdk::collections::{LazyOption, LookupMap, UnorderedMap};
 use near_sdk::{near_bindgen, AccountId};
 
 use crate::contract::ContractInit;
+use crate::models::global_likes_data::GlobalLikesData;
 use crate::models::storage::StorageKey;
 use crate::models::{husy::*, husy_metadata::HusyNFTContractMetadata};
 
@@ -20,6 +21,10 @@ impl ContractInit for HusyContract {
             metadata: LazyOption::new(
                 StorageKey::HusyContractMetadata.try_to_vec().unwrap(),
                 Some(&metadata),
+            ),
+            likes_data: LazyOption::new(
+                StorageKey::GlobalLikesData.try_to_vec().unwrap(),
+                Some(&GlobalLikesData::new()),
             ),
         }
     }

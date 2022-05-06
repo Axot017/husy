@@ -17,36 +17,34 @@ impl MintNFT for HusyContract {
         receiver_id: AccountId,
         royalties: Option<HashMap<AccountId, u32>>,
     ) {
-        with_refund(
-            || {
-                if let Some(royalties) = &royalties {
-                    assert!(
-                        royalties.len() <= 5,
-                        "Cannot add more than 5 royalities account"
-                    );
-                    let sum: u32 = royalties.values().sum();
-                    assert!(
-                        sum < 10_000,
-                        "Sum of royalities cannot be bigger than 10 000"
-                    );
-                }
-                let meme = MemeToken {
-                    owner_id: receiver_id,
-                    royalty: royalties.unwrap_or(HashMap::new()),
-                    ..Default::default()
-                };
+        with_refund(|| {
+            if let Some(royalties) = &royalties {
                 assert!(
-                    self.memes_by_id.insert(&token_id, &meme).is_none(),
-                    "Meme already exists"
+                    royalties.len() <= 5,
+                    "Cannot add more than 5 royalities account"
                 );
+                let sum: u32 = royalties.values().sum();
+                assert!(
+                    sum < 10_000,
+                    "Sum of royalities cannot be bigger than 10 000"
+                );
+            }
+            let meme = MemeToken {
+                owner_id: receiver_id,
+                royalty: royalties.unwrap_or(HashMap::new()),
+                ..Default::default()
+            };
+            assert!(
+                self.memes_by_id.insert(&token_id, &meme).is_none(),
+                "Meme already exists"
+            );
 
-                self.meme_metadata_by_id.insert(&token_id, &token_metadata);
-                self.meme_additional_data_by_id
-                    .insert(&token_id, &Default::default());
-                self.add_meme_to_owner(&meme.owner_id, &token_id)
-            },
-            None,
-        );
+            self.meme_metadata_by_id.insert(&token_id, &token_metadata);
+            self.meme_additional_data_by_id
+                .insert(&token_id, &Default::default());
+
+            (self.add_meme_to_owner(&meme.owner_id, &token_id), None)
+        });
     }
 }
 

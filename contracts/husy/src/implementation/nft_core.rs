@@ -32,7 +32,8 @@ impl NFTTokenCore for HusyContract {
         let sender_id = env::predecessor_account_id();
         with_refund(|| {
             self.nft_meme_transfer(sender_id, receiver_id, token_id, approval_id, memo);
-        }, None)
+            ((), None)
+        })
     }
 
     #[payable]

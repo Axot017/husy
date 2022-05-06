@@ -33,7 +33,9 @@ impl NFTApproval for HusyContract {
 
             token.next_approval_id += 1;
             self.memes_by_id.insert(&token_id, &token);
-        }, None);
+
+            ((), None)
+        });
 
         if let Some(msg) = msg {
             ext_nft_approval_receiver::nft_on_approve(
@@ -77,8 +79,10 @@ impl NFTApproval for HusyContract {
 
         with_refund(|| {
             token.approved_account_ids.remove(&account_id);
-            self.memes_by_id.insert(&token_id, &token)
-        }, None);
+            self.memes_by_id.insert(&token_id, &token);
+
+            ((), None)
+        });
     }
 
     fn nft_revoke_all(&mut self, token_id: MemeTokenId) {
@@ -93,7 +97,9 @@ impl NFTApproval for HusyContract {
         with_refund(|| {
             token.approved_account_ids.clear();
             self.memes_by_id.insert(&token_id, &token);
-        }, None)
+
+            ((), None)
+        })
     }
 }
 

@@ -18,6 +18,9 @@ impl ContractInit for HusyContract {
             meme_metadata_by_id: UnorderedMap::new(
                 StorageKey::MemeMetadataById.try_to_vec().unwrap(),
             ),
+            meme_additional_data_by_id: UnorderedMap::new(
+                StorageKey::MemeAdditionalData.try_to_vec().unwrap(),
+            ),
             metadata: LazyOption::new(
                 StorageKey::HusyContractMetadata.try_to_vec().unwrap(),
                 Some(&metadata),

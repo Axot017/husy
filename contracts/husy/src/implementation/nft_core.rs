@@ -167,6 +167,7 @@ mod test {
         let meme_id = "meme.testnet".to_string();
 
         contract.memes_by_id.insert(&meme_id, &meme_token);
+        contract.meme_additional_data_by_id.insert(&meme_id, &Default::default());
         contract
             .meme_metadata_by_id
             .insert(&meme_id, &meme_token_metadata);

@@ -81,6 +81,8 @@ impl HusyContract {
             approved_account_ids: token.approved_account_ids,
             royalty: token.royalty,
             likes: token.likes,
+            category: token.category,
+            showed_on_main: token.showed_on_main,
         });
     }
 
@@ -200,8 +202,9 @@ mod test {
             next_approval_id: 1,
             royalty: HashMap::from([("royality.testnet".to_string(), 1000)]),
             likes: 1,
-            showed_on_main: false,
+            showed_on_main: true,
             last_counted_like_timestamp: 0,
+            category: Some("category".to_string()),
         };
         let meme_token_metadata = MemeTokenMetadata {
             title: Some("title".to_string()),
@@ -227,6 +230,8 @@ mod test {
                 approved_account_ids: HashMap::from([("approved.testnet".to_string(), 0)]),
                 royalty: HashMap::from([("royality.testnet".to_string(), 1000)]),
                 likes: 1,
+                showed_on_main: true,
+                category: Some("category".to_string()),
             })
         )
     }

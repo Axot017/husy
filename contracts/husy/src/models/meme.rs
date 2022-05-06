@@ -19,6 +19,7 @@ pub struct MemeToken {
     pub likes: u64,
     pub showed_on_main: bool,
     pub last_counted_like_timestamp: u64,
+    pub category: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Clone, Default, Debug)]
@@ -30,4 +31,6 @@ pub struct MemeTokenView {
     pub approved_account_ids: HashMap<AccountId, u64>,
     pub royalty: HashMap<AccountId, u32>,
     pub likes: u64,
+    pub showed_on_main: bool,
+    pub category: Option<String>,
 }

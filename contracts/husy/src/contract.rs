@@ -101,3 +101,15 @@ pub trait NFTRoyality {
         max_len_payout: u32,
     ) -> Payout;
 }
+
+pub trait MemeInteraction {
+    fn like_meme(&mut self, token_id: MemeTokenId, likes: u64);
+
+    fn get_memes(
+        &self,
+        from_index: Option<U128>,
+        limit: Option<u64>,
+        category: Option<String>,
+        main_page_only: bool,
+    ) -> Vec<MemeTokenView>;
+}

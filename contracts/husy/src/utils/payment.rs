@@ -2,12 +2,18 @@ use std::{collections::HashMap, mem::size_of};
 
 use near_sdk::{env, AccountId, Balance, Promise};
 
-pub(crate) fn with_refund<F, R>(fun: F, reveiver_id: Option<AccountId>) -> R
+/// Takes function F as param
+/// Function F can touple 2 of values 
+/// 
+/// First will be returned from with_refund function
+/// 
+/// Second is the account which will get refund
+pub(crate) fn with_refund<F, R>(fun: F) -> R
 where
-    F: FnOnce() -> R,
+    F: FnOnce() -> (R, Option<AccountId>),
 {
     let initial_storage_usage = env::storage_usage();
-    let result = fun();
+    let (result, receiver_id) = fun();
     let final_storage_usage = env::storage_usage();
     let refund = if initial_storage_usage > final_storage_usage {
         let released_storage = initial_storage_usage - final_storage_usage;
@@ -25,7 +31,7 @@ where
     };
 
     if refund > 0 {
-        let receiver_id = reveiver_id.unwrap_or(env::predecessor_account_id());
+        let receiver_id = receiver_id.unwrap_or(env::predecessor_account_id());
         Promise::new(receiver_id).transfer(refund);
     }
 

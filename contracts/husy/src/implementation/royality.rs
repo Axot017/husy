@@ -21,20 +21,18 @@ impl NFTRoyality for HusyContract {
         max_len_payout: u32,
     ) -> Payout {
         let sender_id = env::predecessor_account_id();
-        let meme = self.memes_by_id.get(&token_id).expect("Meme not found");
 
         with_refund(
             || {
-                self.nft_meme_transfer(
+                let previous = self.nft_meme_transfer(
                     sender_id,
                     receiver_id,
                     token_id.clone(),
                     Some(approval_id),
                     memo,
                 );
-                self.get_meme_payout(token_id, balance, max_len_payout)
+                (self.get_meme_payout(token_id, balance, max_len_payout), Some(previous.owner_id))
             },
-            Some(meme.owner_id),
         )
     }
 }

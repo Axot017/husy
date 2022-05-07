@@ -10,5 +10,6 @@ pub enum StorageKey {
     MemeMetadataById,
     HusyContractMetadata,
     GlobalLikesData,
+    MemeAdditionalData,
     MemePerOwnerInner { account_id_hash: CryptoHash },
 }

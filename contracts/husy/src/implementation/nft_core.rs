@@ -32,7 +32,8 @@ impl NFTTokenCore for HusyContract {
         let sender_id = env::predecessor_account_id();
         with_refund(|| {
             self.nft_meme_transfer(sender_id, receiver_id, token_id, approval_id, memo);
-        }, None)
+            ((), None)
+        })
     }
 
     #[payable]
@@ -167,6 +168,7 @@ mod test {
         let meme_id = "meme.testnet".to_string();
 
         contract.memes_by_id.insert(&meme_id, &meme_token);
+        contract.meme_additional_data_by_id.insert(&meme_id, &Default::default());
         contract
             .meme_metadata_by_id
             .insert(&meme_id, &meme_token_metadata);

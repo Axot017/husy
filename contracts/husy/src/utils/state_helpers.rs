@@ -74,15 +74,16 @@ impl HusyContract {
             Some(metadata) => metadata,
             None => self.meme_metadata_by_id.get(&id)?,
         };
+        let additional_data = self.meme_additional_data_by_id.get(&id)?;
         return Some(MemeTokenView {
             metadata,
             owner_id: token.owner_id,
             token_id: id,
             approved_account_ids: token.approved_account_ids,
             royalty: token.royalty,
-            likes: token.likes,
-            category: token.category,
-            showed_on_main: token.showed_on_main,
+            likes: additional_data.likes,
+            category: additional_data.category,
+            showed_on_main: additional_data.showed_on_main,
         });
     }
 
@@ -177,6 +178,7 @@ mod test {
 
     use crate::contract::ContractInit;
     use crate::models::meme::MemeToken;
+    use crate::models::meme_additional_data::MemeAdditionalData;
     use crate::models::meme_metadata::MemeTokenMetadata;
 
     use super::*;
@@ -201,6 +203,8 @@ mod test {
             approved_account_ids: HashMap::from([("approved.testnet".to_string(), 0)]),
             next_approval_id: 1,
             royalty: HashMap::from([("royality.testnet".to_string(), 1000)]),
+        };
+        let additional_data = MemeAdditionalData {
             likes: 1,
             showed_on_main: true,
             last_counted_like_timestamp: 0,
@@ -211,6 +215,9 @@ mod test {
             description: Some("description".to_string()),
             ..Default::default()
         };
+        contract
+            .meme_additional_data_by_id
+            .insert(&"id.testnet".to_string(), &additional_data);
         contract
             .memes_by_id
             .insert(&"id.testnet".to_string(), &meme_token.clone());
@@ -278,6 +285,9 @@ mod test {
             description: Some("description".to_string()),
             ..Default::default()
         };
+        contract
+            .meme_additional_data_by_id
+            .insert(&"bb.testnet".to_string(), &Default::default());
         contract
             .memes_by_id
             .insert(&"bb.testnet".to_string(), &meme_token.clone());

@@ -40,8 +40,11 @@ impl MintNFT for HusyContract {
             );
 
             self.meme_metadata_by_id.insert(&token_id, &token_metadata);
-            self.add_meme_to_owner(&meme.owner_id, &token_id)
-        }, None);
+            self.meme_additional_data_by_id
+                .insert(&token_id, &Default::default());
+
+            (self.add_meme_to_owner(&meme.owner_id, &token_id), None)
+        });
     }
 }
 
@@ -52,6 +55,7 @@ mod test {
     use near_sdk::{Balance, MockedBlockchain};
 
     use crate::contract::ContractInit;
+    use crate::models::meme_additional_data::MemeAdditionalData;
 
     use super::*;
 
@@ -169,6 +173,12 @@ mod test {
                 .get(0)
                 .unwrap(),
             token_id.clone()
+        );
+        assert_eq!(
+            contract.meme_additional_data_by_id.get(&token_id).unwrap(),
+            MemeAdditionalData {
+                ..Default::default()
+            }
         )
     }
 

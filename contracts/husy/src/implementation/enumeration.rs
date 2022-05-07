@@ -183,6 +183,9 @@ mod test {
             let metadata = &metadatas[i];
             contract.meme_metadata_by_id.insert(id, metadata);
             contract.memes_by_id.insert(id, meme);
+            contract
+                .meme_additional_data_by_id
+                .insert(id, &Default::default());
         }
 
         let result = contract.nft_tokens(None, None);
@@ -254,6 +257,9 @@ mod test {
             let metadata = &metadatas[i];
             contract.meme_metadata_by_id.insert(id, metadata);
             contract.memes_by_id.insert(id, meme);
+            contract
+                .meme_additional_data_by_id
+                .insert(id, &Default::default());
         }
         let skipped = 1;
         let limit = 2;
@@ -349,6 +355,9 @@ mod test {
             contract.add_meme_to_owner(&meme.owner_id, id);
             contract.meme_metadata_by_id.insert(id, metadata);
             contract.memes_by_id.insert(id, meme);
+            contract
+                .meme_additional_data_by_id
+                .insert(id, &Default::default());
         }
         let skipped = 1;
         let limit = 2;

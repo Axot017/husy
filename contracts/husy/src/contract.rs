@@ -107,7 +107,7 @@ pub trait MemeInteraction {
 
     fn get_memes(
         &self,
-        from_index: Option<U128>,
+        from_index: Option<u128>,
         limit: Option<u64>,
         category: Option<String>,
         main_page_only: bool,

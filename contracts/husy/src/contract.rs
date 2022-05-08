@@ -110,6 +110,7 @@ pub trait MemeInteraction {
         from_index: Option<u128>,
         limit: Option<u64>,
         category: Option<String>,
+        owner: Option<AccountId>,
         main_page_only: bool,
     ) -> Vec<MemeTokenView>;
 }

@@ -1,0 +1,45 @@
+name: Husy Coin test
+
+on:
+  pull_request:
+    branches: [master]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  husy-coin-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      husy-coin: ${{ steps.filter.outputs.husy-coin }}
+    steps:
+    - uses: actions/checkout@v2
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          husy-coin:
+            - 'contracts/husy-coin/**'
+
+  run-husy-coin-tests:
+    runs-on: ubuntu-latest
+    env:
+      cache_id: husy-coin
+    needs: husy-coin-changes
+    if: ${{ needs.husy-coin-changes.outputs.husy-coin == 'true' }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            ./target
+          key: ${{ env.cache_id }}-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-${{ env.RUSTC_HASH }}
+
+      - name: test-husy-coin
+        working-directory: ./contracts/husy-coin
+        run: |
+          cargo test -- --nocapture --test-threads 1

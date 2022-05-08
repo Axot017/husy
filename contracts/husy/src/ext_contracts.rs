@@ -1,7 +1,6 @@
 use near_sdk::ext_contract;
 
 use crate::models::meme::MemeTokenId;
-use std::collections::HashMap;
 
 #[ext_contract(ext_nft_reciever)]
 pub trait NFTReciever {

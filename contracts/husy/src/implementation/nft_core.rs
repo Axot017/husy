@@ -3,7 +3,8 @@ use std::collections::HashMap;
 
 use crate::{
     contract::NFTTokenCore,
-    ext_contracts::{ext_nft_reciever, ext_self_resolver},
+    ext_contracts::ext_nft_reciever,
+    ext_self_contracts::ext_self_resolver,
     models::{
         husy::*,
         meme::{MemeTokenId, MemeTokenView},
@@ -168,7 +169,9 @@ mod test {
         let meme_id = "meme.testnet".to_string();
 
         contract.memes_by_id.insert(&meme_id, &meme_token);
-        contract.meme_additional_data_by_id.insert(&meme_id, &Default::default());
+        contract
+            .meme_additional_data_by_id
+            .insert(&meme_id, &Default::default());
         contract
             .meme_metadata_by_id
             .insert(&meme_id, &meme_token_metadata);

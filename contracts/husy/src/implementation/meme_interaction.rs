@@ -1,4 +1,4 @@
-use near_sdk::AccountId;
+use near_sdk::{env, near_bindgen, AccountId};
 
 use crate::{
     contract::MemeInteraction,
@@ -6,17 +6,40 @@ use crate::{
         husy::*,
         meme::{MemeTokenId, MemeTokenView},
     },
+    utils::likes_helpers::{count_new_likes_state, try_move_to_main},
 };
 
 const YOCTO_NEAR_PER_LIKE: u128 = 50_000_000_000_000_000_000_000;
 
+#[near_bindgen]
 impl MemeInteraction for HusyContract {
     fn yocto_near_price_for_like(&self) -> u128 {
         YOCTO_NEAR_PER_LIKE
     }
 
-    fn like_meme(&mut self, token_id: MemeTokenId, likes: u64) {
-        todo!()
+    #[payable]
+    fn like_meme(&mut self, meme_id: MemeTokenId, likes: u64) {
+        let attached = env::attached_deposit();
+        let needed = YOCTO_NEAR_PER_LIKE * likes as u128;
+        assert!(
+            attached >= needed,
+            "Not enought deposit attached. You need at least: {} yoctoNEAR",
+            needed
+        );
+
+        let meme = self.memes_by_id.get(&meme_id).expect("Meme not found");
+        let predecessor_account_id = env::predecessor_account_id();
+        assert_ne!(
+            &predecessor_account_id, &meme.owner_id,
+            "Cannot like own meme"
+        );
+
+        let mut meme_additional_data = self.meme_additional_data_by_id.get(&meme_id).unwrap();
+        let mut global_likes_data = self.global_likes_data.get().unwrap();
+
+        count_new_likes_state(&mut meme_additional_data, &mut global_likes_data, likes);
+        try_move_to_main(&mut meme_additional_data, &global_likes_data);
+        global_likes_data.try_switching_mode();
     }
 
     fn get_memes(
@@ -72,9 +95,10 @@ mod test {
 
     use super::*;
 
-    fn get_context(predecessor_account_id: AccountId) -> VMContext {
+    fn get_context(predecessor_account_id: AccountId, attached: u128) -> VMContext {
         VMContextBuilder::new()
             .predecessor_account_id(predecessor_account_id.try_into().unwrap())
+            .attached_deposit(attached)
             .build()
     }
 
@@ -105,9 +129,40 @@ mod test {
     }
 
     #[test]
+    #[should_panic(expected = "Cannot like own meme")]
+    fn like_meme_liking_own_meme() {
+        let owner_id = "owner_id.testnet".to_string();
+        let context = get_context(owner_id.clone(), YOCTO_NEAR_PER_LIKE);
+        testing_env!(context);
+        let mut contract = HusyContract::new_default(owner_id.clone());
+        let meme_id = "some_meme_id.testnet".to_string();
+
+        contract.memes_by_id.insert(
+            &meme_id,
+            &MemeToken {
+                owner_id: owner_id.clone(),
+                ..Default::default()
+            },
+        );
+
+        contract.like_meme(meme_id, 1);
+    }
+
+    #[test]
+    #[should_panic]
+    fn like_meme_not_enought_attached_deposit() {
+        let owner_id = "owner_id.testnet".to_string();
+        let context = get_context(owner_id.clone(), 10000);
+        testing_env!(context);
+        let mut contract = HusyContract::new_default(owner_id.clone());
+
+        contract.like_meme("some_meme.testnet".to_string(), 50);
+    }
+
+    #[test]
     fn yocto_near_price_for_like_test() {
         let owner_id = "owner_id.testnet".to_string();
-        let context = get_context(owner_id.clone());
+        let context = get_context(owner_id.clone(), 0);
         testing_env!(context);
         let contract = HusyContract::new_default(owner_id.clone());
 
@@ -118,7 +173,7 @@ mod test {
     #[test]
     fn get_memes_with_filters() {
         let owner_id = "owner_id.testnet".to_string();
-        let context = get_context(owner_id.clone());
+        let context = get_context(owner_id.clone(), 0);
         testing_env!(context);
         let mut contract = HusyContract::new_default(owner_id.clone());
 

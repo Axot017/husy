@@ -25,7 +25,7 @@ impl ContractInit for HusyContract {
                 StorageKey::HusyContractMetadata.try_to_vec().unwrap(),
                 Some(&metadata),
             ),
-            likes_data: LazyOption::new(
+            global_likes_data: LazyOption::new(
                 StorageKey::GlobalLikesData.try_to_vec().unwrap(),
                 Some(&GlobalLikesData::new()),
             ),

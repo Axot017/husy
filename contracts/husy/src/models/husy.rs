@@ -21,5 +21,5 @@ pub struct HusyContract {
     pub meme_metadata_by_id: UnorderedMap<MemeTokenId, MemeTokenMetadata>,
     pub meme_additional_data_by_id: UnorderedMap<MemeTokenId, MemeAdditionalData>,
     pub metadata: LazyOption<HusyNFTContractMetadata>,
-    pub likes_data: LazyOption<GlobalLikesData>,
+    pub global_likes_data: LazyOption<GlobalLikesData>,
 }

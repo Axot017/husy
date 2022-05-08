@@ -346,6 +346,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "husy-coin"
+version = "0.1.0"
+dependencies = [
+ "near-sdk",
+ "serde_json",
+]
+
+[[package]]
 name = "indexmap"
 version = "1.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"

@@ -103,6 +103,8 @@ pub trait NFTRoyality {
 }
 
 pub trait MemeInteraction {
+    fn yocto_near_price_for_like(&self) -> u128;
+
     fn like_meme(&mut self, token_id: MemeTokenId, likes: u64);
 
     fn get_memes(

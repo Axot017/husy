@@ -8,7 +8,13 @@ use crate::{
     },
 };
 
+const YOCTO_NEAR_PER_LIKE: u128 = 50_000_000_000_000_000_000_000;
+
 impl MemeInteraction for HusyContract {
+    fn yocto_near_price_for_like(&self) -> u128 {
+        YOCTO_NEAR_PER_LIKE
+    }
+
     fn like_meme(&mut self, token_id: MemeTokenId, likes: u64) {
         todo!()
     }
@@ -96,6 +102,17 @@ mod test {
                 },
             );
         }
+    }
+
+    #[test]
+    fn yocto_near_price_for_like_test() {
+        let owner_id = "owner_id.testnet".to_string();
+        let context = get_context(owner_id.clone());
+        testing_env!(context);
+        let contract = HusyContract::new_default(owner_id.clone());
+
+        let result = contract.yocto_near_price_for_like();
+        assert_eq!(result, YOCTO_NEAR_PER_LIKE);
     }
 
     #[test]

@@ -5,5 +5,5 @@ window.nearConnect = connect;
 window.nearWalletConnection = WalletConnection;
 
 import("./pkg").then(module => {
-  module.run_app();
+  module.run_app(process.env);
 });

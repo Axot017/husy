@@ -31,7 +31,7 @@ where
     };
 
     if refund > 0 {
-        let receiver_id = receiver_id.unwrap_or(env::predecessor_account_id());
+        let receiver_id = receiver_id.unwrap_or_else(env::predecessor_account_id);
         Promise::new(receiver_id).transfer(refund);
     }
 

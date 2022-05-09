@@ -16,8 +16,7 @@ impl NFTEnumeration for HusyContract {
             .iter()
             .skip(from_index.unwrap_or(U128(0)).0 as usize)
             .take(limit.unwrap_or(self.meme_metadata_by_id.len()) as usize)
-            .map(|(key, value)| self.get_meme_view(key, Some(value)))
-            .flatten()
+            .filter_map(|(key, value)| self.get_meme_view(key, Some(value)))
             .collect()
     }
 
@@ -43,8 +42,7 @@ impl NFTEnumeration for HusyContract {
             .iter()
             .skip(from_index.unwrap_or(U128(0)).0 as usize)
             .take(limit.unwrap_or(self.meme_metadata_by_id.len()) as usize)
-            .map(|id| self.get_meme_view(id, None))
-            .flatten()
+            .filter_map(|id| self.get_meme_view(id, None))
             .collect()
     }
 }

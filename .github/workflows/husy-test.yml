@@ -42,4 +42,6 @@ jobs:
       - name: test-husy
         working-directory: ./contracts/husy
         run: |
+          rustup component add clippy
+          cargo clippy --all-targets --all-features -- -D warnings
           cargo test -- --nocapture --test-threads 1

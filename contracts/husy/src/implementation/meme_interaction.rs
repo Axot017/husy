@@ -102,7 +102,7 @@ mod test {
             .build()
     }
 
-    fn feed_contract(contract: &mut HusyContract, memes: &Vec<MemeTokenView>) {
+    fn feed_contract(contract: &mut HusyContract, memes: &[MemeTokenView]) {
         for meme in memes.iter() {
             contract.memes_by_id.insert(
                 &meme.token_id,
@@ -140,7 +140,7 @@ mod test {
         contract.memes_by_id.insert(
             &meme_id,
             &MemeToken {
-                owner_id: owner_id.clone(),
+                owner_id,
                 ..Default::default()
             },
         );
@@ -154,7 +154,7 @@ mod test {
         let owner_id = "owner_id.testnet".to_string();
         let context = get_context(owner_id.clone(), 10000);
         testing_env!(context);
-        let mut contract = HusyContract::new_default(owner_id.clone());
+        let mut contract = HusyContract::new_default(owner_id);
 
         contract.like_meme("some_meme.testnet".to_string(), 50);
     }
@@ -164,7 +164,7 @@ mod test {
         let owner_id = "owner_id.testnet".to_string();
         let context = get_context(owner_id.clone(), 0);
         testing_env!(context);
-        let contract = HusyContract::new_default(owner_id.clone());
+        let contract = HusyContract::new_default(owner_id);
 
         let result = contract.yocto_near_price_for_like();
         assert_eq!(result, YOCTO_NEAR_PER_LIKE);

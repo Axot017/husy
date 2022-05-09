@@ -63,8 +63,8 @@ pub(crate) fn count_new_likes_state(
     meme_likes_state.likes += likes;
 
     if !meme_likes_state.showed_on_main {
-        let liked_first_time = &meme_likes_state.last_counted_like_timestamp
-            == &global_state.last_group_swap_timestamp;
+        let liked_first_time = meme_likes_state.last_counted_like_timestamp
+            == global_state.last_group_swap_timestamp;
         global_state.add_likes(likes, liked_first_time);
         if liked_first_time {
             meme_likes_state.last_counted_like_timestamp = global_state.last_group_swap_timestamp;

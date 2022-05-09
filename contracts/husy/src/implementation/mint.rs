@@ -31,7 +31,7 @@ impl MintNFT for HusyContract {
             }
             let meme = MemeToken {
                 owner_id: receiver_id,
-                royalty: royalties.unwrap_or(HashMap::new()),
+                royalty: royalties.unwrap_or_default(),
                 ..Default::default()
             };
             assert!(
@@ -83,9 +83,9 @@ mod test {
         let receiver_id = "receiver.testnet".to_string();
 
         contract.nft_mint(
-            token_id.clone(),
-            metadata.clone(),
-            receiver_id.clone(),
+            token_id,
+            metadata,
+            receiver_id,
             Some(HashMap::from([
                 ("account1.testnet".to_string(), 9_999),
                 ("account2.testnet".to_string(), 20),
@@ -110,9 +110,9 @@ mod test {
         let receiver_id = "receiver.testnet".to_string();
 
         contract.nft_mint(
-            token_id.clone(),
-            metadata.clone(),
-            receiver_id.clone(),
+            token_id,
+            metadata,
+            receiver_id,
             Some(HashMap::from([
                 ("account1.testnet".to_string(), 10),
                 ("account2.testnet".to_string(), 20),
@@ -160,19 +160,16 @@ mod test {
                 ..Default::default()
             })
         );
-        assert_eq!(
-            contract.meme_metadata_by_id.get(&token_id),
-            Some(metadata.clone())
-        );
+        assert_eq!(contract.meme_metadata_by_id.get(&token_id), Some(metadata));
         assert_eq!(
             contract
                 .memes_per_owner
-                .get(&receiver_id.clone())
+                .get(&receiver_id)
                 .unwrap()
                 .as_vector()
                 .get(0)
                 .unwrap(),
-            token_id.clone()
+            token_id
         );
         assert_eq!(
             contract.meme_additional_data_by_id.get(&token_id).unwrap(),
@@ -204,11 +201,6 @@ mod test {
             receiver_id.clone(),
             None,
         );
-        contract.nft_mint(
-            token_id.clone(),
-            metadata.clone(),
-            receiver_id.clone(),
-            None,
-        );
+        contract.nft_mint(token_id, metadata, receiver_id, None);
     }
 }

@@ -13,5 +13,13 @@
         "webpack-cli": "^3.3.9",
         "webpack-dev-server": "^3.8.2"
     },
-    "dependencies": {}
+    "dependencies": {
+        "@near-wallet-selector/core": "^3.0.2",
+        "@near-wallet-selector/ledger": "^3.0.2",
+        "@near-wallet-selector/math-wallet": "^3.0.2",
+        "@near-wallet-selector/near-wallet": "^3.0.2",
+        "@near-wallet-selector/sender": "^3.0.2",
+        "near-api-js": "^0.44.2",
+        "tslib": "^2.4.0"
+    }
 }

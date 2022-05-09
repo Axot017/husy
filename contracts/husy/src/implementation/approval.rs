@@ -131,7 +131,7 @@ mod test {
         contract.memes_by_id.insert(
             &token_id,
             &MemeToken {
-                owner_id: account_id.clone(),
+                owner_id: account_id,
                 approved_account_ids: HashMap::from([
                     ("account1.testnet".to_string(), 0),
                     ("account2.testnet".to_string(), 1),
@@ -159,7 +159,7 @@ mod test {
         let account_id = "acbvbcvbc.testnet".to_string();
         let ctx = get_context(&account_id, 0);
         testing_env!(ctx);
-        let mut contract = HusyContract::new_default(account_id.clone());
+        let mut contract = HusyContract::new_default(account_id);
         let token_id = "asdfzvczx.testnet".to_string();
         contract.memes_by_id.insert(
             &token_id,
@@ -178,7 +178,7 @@ mod test {
         let account_id = "acbvbcvbc.testnet".to_string();
         let ctx = get_context(&account_id, 0);
         testing_env!(ctx);
-        let mut contract = HusyContract::new_default(account_id.clone());
+        let mut contract = HusyContract::new_default(account_id);
 
         contract.nft_revoke_all("invalid_token_id.testnet".to_string())
     }
@@ -194,7 +194,7 @@ mod test {
         contract.memes_by_id.insert(
             &token_id,
             &MemeToken {
-                owner_id: account_id.clone(),
+                owner_id: account_id,
                 approved_account_ids: HashMap::from([(approved_account_id.clone(), 0)]),
                 next_approval_id: 1,
                 ..Default::default()
@@ -217,7 +217,7 @@ mod test {
         let account_id = "acbvbcvbc.testnet".to_string();
         let ctx = get_context(&account_id, 0);
         testing_env!(ctx);
-        let mut contract = HusyContract::new_default(account_id.clone());
+        let mut contract = HusyContract::new_default(account_id);
         let token_id = "asdfzvczx.testnet".to_string();
         contract.memes_by_id.insert(
             &token_id,
@@ -236,7 +236,7 @@ mod test {
         let account_id = "acbvbcvbc.testnet".to_string();
         let ctx = get_context(&account_id, 0);
         testing_env!(ctx);
-        let mut contract = HusyContract::new_default(account_id.clone());
+        let mut contract = HusyContract::new_default(account_id);
 
         contract.nft_revoke(
             "invalid_token_id.testnet".to_string(),
@@ -250,7 +250,7 @@ mod test {
         let account_id = "acbvbcvbc.testnet".to_string();
         let ctx = get_context(&account_id, 0);
         testing_env!(ctx);
-        let contract = HusyContract::new_default(account_id.clone());
+        let contract = HusyContract::new_default(account_id);
 
         contract.nft_is_approved(
             "some_token.testnet".to_string(),
@@ -281,35 +281,28 @@ mod test {
             &MemeToken {
                 approved_account_ids: HashMap::from([(account_id.clone(), 2)]),
                 next_approval_id: 3,
-                owner_id: owner_id.clone(),
+                owner_id,
                 ..Default::default()
             },
         );
 
-        assert_eq!(
-            contract.nft_is_approved("not_approved.testnet".to_string(), account_id.clone(), None),
-            false
-        );
-        assert_eq!(
-            contract.nft_is_approved(
-                "approved.testnet".to_string(),
-                "not_owner.testnet".to_string(),
-                None
-            ),
-            false
-        );
-        assert_eq!(
-            contract.nft_is_approved("approved.testnet".to_string(), account_id.clone(), Some(1)),
-            false
-        );
-        assert_eq!(
-            contract.nft_is_approved("approved.testnet".to_string(), account_id.clone(), None),
-            true
-        );
-        assert_eq!(
-            contract.nft_is_approved("approved.testnet".to_string(), account_id.clone(), Some(2)),
-            true
-        );
+        assert!(!contract.nft_is_approved(
+            "not_approved.testnet".to_string(),
+            account_id.clone(),
+            None
+        ));
+        assert!(!contract.nft_is_approved(
+            "approved.testnet".to_string(),
+            "not_owner.testnet".to_string(),
+            None
+        ));
+        assert!(!contract.nft_is_approved(
+            "approved.testnet".to_string(),
+            account_id.clone(),
+            Some(1)
+        ));
+        assert!(contract.nft_is_approved("approved.testnet".to_string(), account_id.clone(), None));
+        assert!(contract.nft_is_approved("approved.testnet".to_string(), account_id, Some(2)));
     }
 
     #[test]

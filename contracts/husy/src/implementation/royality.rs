@@ -71,7 +71,7 @@ mod test {
                     ("1.testnet".to_string(), 100),
                     ("2.testnet".to_string(), 200),
                 ]),
-                owner_id: account_id.clone(),
+                owner_id: account_id,
                 ..Default::default()
             },
         );

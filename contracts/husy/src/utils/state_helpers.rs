@@ -39,7 +39,7 @@ impl HusyContract {
         let mut owned_memes = self
             .memes_per_owner
             .get(owner_id)
-            .expect(format!("User {} has no memes", owner_id).as_str());
+            .unwrap_or_else(|| panic!("User {} has no memes", owner_id));
 
         let result = owned_memes.remove(meme_id);
 
@@ -75,7 +75,8 @@ impl HusyContract {
             None => self.meme_metadata_by_id.get(&id)?,
         };
         let additional_data = self.meme_additional_data_by_id.get(&id)?;
-        return Some(MemeTokenView {
+
+        Some(MemeTokenView {
             metadata,
             owner_id: token.owner_id,
             token_id: id,
@@ -84,7 +85,7 @@ impl HusyContract {
             likes: additional_data.likes,
             category: additional_data.category,
             showed_on_main: additional_data.showed_on_main,
-        });
+        })
     }
 
     pub(crate) fn nft_meme_transfer(
@@ -148,7 +149,7 @@ impl HusyContract {
     ) -> Payout {
         let token = self.memes_by_id.get(&token_id).expect("Invalid token id");
         assert!(
-            token.royalty.len() as u32 + 1 <= max_len_payout,
+            (token.royalty.len() as u32) < max_len_payout,
             "Market cannot payout to that many receivers"
         );
 
@@ -220,10 +221,10 @@ mod test {
             .insert(&"id.testnet".to_string(), &additional_data);
         contract
             .memes_by_id
-            .insert(&"id.testnet".to_string(), &meme_token.clone());
+            .insert(&"id.testnet".to_string(), &meme_token);
         contract
             .meme_metadata_by_id
-            .insert(&"id.testnet".to_string(), &meme_token_metadata.to_owned());
+            .insert(&"id.testnet".to_string(), &meme_token_metadata);
 
         let result =
             contract.get_meme_view("id.testnet".to_string(), Some(meme_token_metadata.clone()));
@@ -260,10 +261,10 @@ mod test {
         };
         contract
             .memes_by_id
-            .insert(&"aa.testnet".to_string(), &meme_token.clone());
+            .insert(&"aa.testnet".to_string(), &meme_token);
         contract
             .meme_metadata_by_id
-            .insert(&"aa.testnet".to_string(), &meme_token_metadata.to_owned());
+            .insert(&"aa.testnet".to_string(), &meme_token_metadata);
 
         let result = contract.get_meme_view("wrong_id.testnet".to_string(), None);
 
@@ -290,10 +291,10 @@ mod test {
             .insert(&"bb.testnet".to_string(), &Default::default());
         contract
             .memes_by_id
-            .insert(&"bb.testnet".to_string(), &meme_token.clone());
+            .insert(&"bb.testnet".to_string(), &meme_token);
         contract
             .meme_metadata_by_id
-            .insert(&"bb.testnet".to_string(), &meme_token_metadata.to_owned());
+            .insert(&"bb.testnet".to_string(), &meme_token_metadata);
 
         let result = contract.get_meme_view("bb.testnet".to_string(), None);
 

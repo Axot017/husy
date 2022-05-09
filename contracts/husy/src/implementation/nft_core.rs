@@ -159,7 +159,6 @@ mod test {
             approved_account_ids: HashMap::from([("approved.testnet".to_string(), 0)]),
             next_approval_id: 1,
             royalty: HashMap::from([("royality.testnet".to_string(), 1000)]),
-            ..Default::default()
         };
         let meme_token_metadata = MemeTokenMetadata {
             title: Some("title".to_string()),

@@ -22,8 +22,8 @@ mod test {
 
     fn get_context(predecessor_account_id: String, storage_usage: u64) -> VMContext {
         VMContext {
-            current_account_id: "current.testnet".to_string(),
-            signer_account_id: "signer.testnet".to_string(),
+            current_account_id: "current.testnet".to_owned(),
+            signer_account_id: "signer.testnet".to_owned(),
             signer_account_pk: vec![0, 1, 2],
             predecessor_account_id,
             input: vec![],
@@ -43,19 +43,19 @@ mod test {
 
     #[test]
     fn success_nft_metadata() {
-        let context = get_context("aaa.testnet".to_string(), 10000000);
+        let context = get_context("aaa.testnet".to_owned(), 10000000);
         testing_env!(context);
 
         let metadata = HusyNFTContractMetadata {
-            spec: "nft-1.0.0".to_string(),
-            name: "TestNFT".to_string(),
-            symbol: "TEST".to_string(),
+            spec: "nft-1.0.0".to_owned(),
+            name: "TestNFT".to_owned(),
+            symbol: "TEST".to_owned(),
             icon: None,
             base_uri: None,
             reference: None,
             reference_hash: None,
         };
-        let contract = HusyContract::new("aaa.testnet".to_string(), metadata.clone());
+        let contract = HusyContract::new("aaa.testnet".to_owned(), metadata.clone());
 
         let result = contract.nft_metadata();
 

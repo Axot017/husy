@@ -195,115 +195,115 @@ mod test {
 
     #[test]
     fn get_meme_view_with_metadata() {
-        let context = get_context("aaa.testnet".to_string());
+        let context = get_context("aaa.testnet".to_owned());
         testing_env!(context);
-        let mut contract = HusyContract::new_default("aaa.testnet".to_string());
+        let mut contract = HusyContract::new_default("aaa.testnet".to_owned());
 
         let meme_token = MemeToken {
-            owner_id: "aaa.testnet".to_string(),
-            approved_account_ids: HashMap::from([("approved.testnet".to_string(), 0)]),
+            owner_id: "aaa.testnet".to_owned(),
+            approved_account_ids: HashMap::from([("approved.testnet".to_owned(), 0)]),
             next_approval_id: 1,
-            royalty: HashMap::from([("royality.testnet".to_string(), 1000)]),
+            royalty: HashMap::from([("royality.testnet".to_owned(), 1000)]),
         };
         let additional_data = MemeAdditionalData {
             likes: 1,
             showed_on_main: true,
             last_counted_like_timestamp: 0,
-            category: Some("category".to_string()),
+            category: Some("category".to_owned()),
         };
         let meme_token_metadata = MemeTokenMetadata {
-            title: Some("title".to_string()),
-            description: Some("description".to_string()),
+            title: Some("title".to_owned()),
+            description: Some("description".to_owned()),
             ..Default::default()
         };
         contract
             .meme_additional_data_by_id
-            .insert(&"id.testnet".to_string(), &additional_data);
+            .insert(&"id.testnet".to_owned(), &additional_data);
         contract
             .memes_by_id
-            .insert(&"id.testnet".to_string(), &meme_token);
+            .insert(&"id.testnet".to_owned(), &meme_token);
         contract
             .meme_metadata_by_id
-            .insert(&"id.testnet".to_string(), &meme_token_metadata);
+            .insert(&"id.testnet".to_owned(), &meme_token_metadata);
 
         let result =
-            contract.get_meme_view("id.testnet".to_string(), Some(meme_token_metadata.clone()));
+            contract.get_meme_view("id.testnet".to_owned(), Some(meme_token_metadata.clone()));
 
         assert_eq!(
             result,
             Some(MemeTokenView {
                 metadata: meme_token_metadata,
-                owner_id: "aaa.testnet".to_string(),
-                token_id: "id.testnet".to_string(),
-                approved_account_ids: HashMap::from([("approved.testnet".to_string(), 0)]),
-                royalty: HashMap::from([("royality.testnet".to_string(), 1000)]),
+                owner_id: "aaa.testnet".to_owned(),
+                token_id: "id.testnet".to_owned(),
+                approved_account_ids: HashMap::from([("approved.testnet".to_owned(), 0)]),
+                royalty: HashMap::from([("royality.testnet".to_owned(), 1000)]),
                 likes: 1,
                 showed_on_main: true,
-                category: Some("category".to_string()),
+                category: Some("category".to_owned()),
             })
         )
     }
 
     #[test]
     fn get_meme_view_of_not_existing_token() {
-        let context = get_context("bbb.testnet".to_string());
+        let context = get_context("bbb.testnet".to_owned());
         testing_env!(context);
-        let mut contract = HusyContract::new_default("bbb.testnet".to_string());
+        let mut contract = HusyContract::new_default("bbb.testnet".to_owned());
 
         let meme_token = MemeToken {
-            owner_id: "aaa.testnet".to_string(),
+            owner_id: "aaa.testnet".to_owned(),
             ..Default::default()
         };
         let meme_token_metadata = MemeTokenMetadata {
-            title: Some("title".to_string()),
-            description: Some("description".to_string()),
+            title: Some("title".to_owned()),
+            description: Some("description".to_owned()),
             ..Default::default()
         };
         contract
             .memes_by_id
-            .insert(&"aa.testnet".to_string(), &meme_token);
+            .insert(&"aa.testnet".to_owned(), &meme_token);
         contract
             .meme_metadata_by_id
-            .insert(&"aa.testnet".to_string(), &meme_token_metadata);
+            .insert(&"aa.testnet".to_owned(), &meme_token_metadata);
 
-        let result = contract.get_meme_view("wrong_id.testnet".to_string(), None);
+        let result = contract.get_meme_view("wrong_id.testnet".to_owned(), None);
 
         assert_eq!(result, None)
     }
 
     #[test]
     fn get_meme_view_without_metadata() {
-        let context = get_context("ccc.testnet".to_string());
+        let context = get_context("ccc.testnet".to_owned());
         testing_env!(context);
-        let mut contract = HusyContract::new_default("ccc.testnet".to_string());
+        let mut contract = HusyContract::new_default("ccc.testnet".to_owned());
 
         let meme_token = MemeToken {
-            owner_id: "ccc.testnet".to_string(),
+            owner_id: "ccc.testnet".to_owned(),
             ..Default::default()
         };
         let meme_token_metadata = MemeTokenMetadata {
-            title: Some("title".to_string()),
-            description: Some("description".to_string()),
+            title: Some("title".to_owned()),
+            description: Some("description".to_owned()),
             ..Default::default()
         };
         contract
             .meme_additional_data_by_id
-            .insert(&"bb.testnet".to_string(), &Default::default());
+            .insert(&"bb.testnet".to_owned(), &Default::default());
         contract
             .memes_by_id
-            .insert(&"bb.testnet".to_string(), &meme_token);
+            .insert(&"bb.testnet".to_owned(), &meme_token);
         contract
             .meme_metadata_by_id
-            .insert(&"bb.testnet".to_string(), &meme_token_metadata);
+            .insert(&"bb.testnet".to_owned(), &meme_token_metadata);
 
-        let result = contract.get_meme_view("bb.testnet".to_string(), None);
+        let result = contract.get_meme_view("bb.testnet".to_owned(), None);
 
         assert_eq!(
             result,
             Some(MemeTokenView {
                 metadata: meme_token_metadata,
-                owner_id: "ccc.testnet".to_string(),
-                token_id: "bb.testnet".to_string(),
+                owner_id: "ccc.testnet".to_owned(),
+                token_id: "bb.testnet".to_owned(),
                 ..Default::default()
             })
         )
@@ -311,16 +311,16 @@ mod test {
 
     #[test]
     fn test_add_meme_to_owner() {
-        let context = get_context("ccc.testnet".to_string());
+        let context = get_context("ccc.testnet".to_owned());
         testing_env!(context);
-        let mut contract = HusyContract::new_default("ccc.testnet".to_string());
+        let mut contract = HusyContract::new_default("ccc.testnet".to_owned());
 
-        let user_1 = "aaa.testnet".to_string();
-        let user_2 = "bbb.testnet".to_string();
+        let user_1 = "aaa.testnet".to_owned();
+        let user_2 = "bbb.testnet".to_owned();
 
-        contract.add_meme_to_owner(&user_1, &"meme1.testnet".to_string());
-        contract.add_meme_to_owner(&user_1, &"meme2.testnet".to_string());
-        contract.add_meme_to_owner(&user_2, &"meme3.testnet".to_string());
+        contract.add_meme_to_owner(&user_1, &"meme1.testnet".to_owned());
+        contract.add_meme_to_owner(&user_1, &"meme2.testnet".to_owned());
+        contract.add_meme_to_owner(&user_2, &"meme3.testnet".to_owned());
 
         assert_eq!(contract.memes_per_owner.get(&user_1).unwrap().len(), 2);
         assert_eq!(contract.memes_per_owner.get(&user_2).unwrap().len(), 1);
@@ -328,12 +328,12 @@ mod test {
 
     #[test]
     fn remove_meme_from_owner_success_one_meme() {
-        let owner_id = "meme_owner.testnet".to_string();
+        let owner_id = "meme_owner.testnet".to_owned();
         let context = get_context(owner_id.clone());
         testing_env!(context);
-        let mut contract = HusyContract::new_default("contract_owner.testnet".to_string());
+        let mut contract = HusyContract::new_default("contract_owner.testnet".to_owned());
 
-        let test_meme_id = "test_meme.testnet".to_string();
+        let test_meme_id = "test_meme.testnet".to_owned();
         contract.add_meme_to_owner(&owner_id, &test_meme_id);
 
         contract.remove_meme_from_owner(&owner_id, &test_meme_id);
@@ -342,13 +342,13 @@ mod test {
 
     #[test]
     fn remove_meme_from_owner_success_multiple_memes() {
-        let owner_id = "bob.testnet".to_string();
+        let owner_id = "bob.testnet".to_owned();
         let context = get_context(owner_id.clone());
         testing_env!(context);
-        let mut contract = HusyContract::new_default("contract_owner.testnet".to_string());
+        let mut contract = HusyContract::new_default("contract_owner.testnet".to_owned());
 
-        let test_meme_id = "test_meme.testnet".to_string();
-        let test_meme_id2 = "test_meme2.testnet".to_string();
+        let test_meme_id = "test_meme.testnet".to_owned();
+        let test_meme_id2 = "test_meme2.testnet".to_owned();
         contract.add_meme_to_owner(&owner_id, &test_meme_id);
         contract.add_meme_to_owner(&owner_id, &test_meme_id2);
 
@@ -360,12 +360,12 @@ mod test {
     #[test]
     #[should_panic]
     fn remove_meme_from_owner_panics() {
-        let owner_id = "some_guy.testnet".to_string();
+        let owner_id = "some_guy.testnet".to_owned();
         let context = get_context(owner_id.clone());
         testing_env!(context);
-        let mut contract = HusyContract::new_default("contract_owner.testnet".to_string());
+        let mut contract = HusyContract::new_default("contract_owner.testnet".to_owned());
 
-        let test_meme_id = "test_meme.testnet".to_string();
+        let test_meme_id = "test_meme.testnet".to_owned();
 
         contract.remove_meme_from_owner(&owner_id, &test_meme_id);
     }

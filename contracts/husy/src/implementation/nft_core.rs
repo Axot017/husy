@@ -129,8 +129,8 @@ mod test {
 
     fn get_context(predecessor_account_id: String, storage_usage: u64) -> VMContext {
         VMContext {
-            current_account_id: "current.testnet".to_string(),
-            signer_account_id: "signer.testnet".to_string(),
+            current_account_id: "current.testnet".to_owned(),
+            signer_account_id: "signer.testnet".to_owned(),
             signer_account_pk: vec![0, 1, 2],
             predecessor_account_id,
             input: vec![],
@@ -150,22 +150,22 @@ mod test {
 
     #[test]
     fn some_nft_token() {
-        let context = get_context("aaa.testnet".to_string(), 10000000);
+        let context = get_context("aaa.testnet".to_owned(), 10000000);
         testing_env!(context);
-        let mut contract = HusyContract::new_default("aaa.testnet".to_string());
+        let mut contract = HusyContract::new_default("aaa.testnet".to_owned());
 
         let meme_token = MemeToken {
-            owner_id: "aaa.testnet".to_string(),
-            approved_account_ids: HashMap::from([("approved.testnet".to_string(), 0)]),
+            owner_id: "aaa.testnet".to_owned(),
+            approved_account_ids: HashMap::from([("approved.testnet".to_owned(), 0)]),
             next_approval_id: 1,
-            royalty: HashMap::from([("royality.testnet".to_string(), 1000)]),
+            royalty: HashMap::from([("royality.testnet".to_owned(), 1000)]),
         };
         let meme_token_metadata = MemeTokenMetadata {
-            title: Some("title".to_string()),
-            description: Some("description".to_string()),
+            title: Some("title".to_owned()),
+            description: Some("description".to_owned()),
             ..Default::default()
         };
-        let meme_id = "meme.testnet".to_string();
+        let meme_id = "meme.testnet".to_owned();
 
         contract.memes_by_id.insert(&meme_id, &meme_token);
         contract
@@ -181,10 +181,10 @@ mod test {
             result,
             Some(MemeTokenView {
                 token_id: meme_id,
-                owner_id: "aaa.testnet".to_string(),
+                owner_id: "aaa.testnet".to_owned(),
                 metadata: meme_token_metadata,
-                approved_account_ids: HashMap::from([("approved.testnet".to_string(), 0)]),
-                royalty: HashMap::from([("royality.testnet".to_string(), 1000)]),
+                approved_account_ids: HashMap::from([("approved.testnet".to_owned(), 0)]),
+                royalty: HashMap::from([("royality.testnet".to_owned(), 1000)]),
                 ..Default::default()
             })
         );
@@ -192,11 +192,11 @@ mod test {
 
     #[test]
     fn none_nft_token() {
-        let context = get_context("aaa.testnet".to_string(), 10000000);
+        let context = get_context("aaa.testnet".to_owned(), 10000000);
         testing_env!(context);
-        let contract = HusyContract::new_default("aaa.testnet".to_string());
+        let contract = HusyContract::new_default("aaa.testnet".to_owned());
 
-        let result = contract.nft_token("not_existing_id.testnet".to_string());
+        let result = contract.nft_token("not_existing_id.testnet".to_owned());
 
         assert_eq!(result, None);
     }

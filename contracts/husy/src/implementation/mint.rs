@@ -70,25 +70,25 @@ mod test {
     #[should_panic]
     fn nft_mint_panic_royalities_sum_to_big() {
         let attached = 0;
-        let context = get_context("aaa.testnet".to_string(), attached);
+        let context = get_context("aaa.testnet".to_owned(), attached);
         testing_env!(context);
-        let mut contract = HusyContract::new_default("aaa.testnet".to_string());
+        let mut contract = HusyContract::new_default("aaa.testnet".to_owned());
 
-        let token_id = "token.testnet".to_string();
+        let token_id = "token.testnet".to_owned();
         let metadata = MemeTokenMetadata {
-            title: Some("title".to_string()),
-            description: Some("description".to_string()),
+            title: Some("title".to_owned()),
+            description: Some("description".to_owned()),
             ..Default::default()
         };
-        let receiver_id = "receiver.testnet".to_string();
+        let receiver_id = "receiver.testnet".to_owned();
 
         contract.nft_mint(
             token_id,
             metadata,
             receiver_id,
             Some(HashMap::from([
-                ("account1.testnet".to_string(), 9_999),
-                ("account2.testnet".to_string(), 20),
+                ("account1.testnet".to_owned(), 9_999),
+                ("account2.testnet".to_owned(), 20),
             ])),
         );
     }
@@ -97,29 +97,29 @@ mod test {
     #[should_panic]
     fn nft_mint_panic_to_much_royalities() {
         let attached = 0;
-        let context = get_context("aaa.testnet".to_string(), attached);
+        let context = get_context("aaa.testnet".to_owned(), attached);
         testing_env!(context);
-        let mut contract = HusyContract::new_default("aaa.testnet".to_string());
+        let mut contract = HusyContract::new_default("aaa.testnet".to_owned());
 
-        let token_id = "token.testnet".to_string();
+        let token_id = "token.testnet".to_owned();
         let metadata = MemeTokenMetadata {
-            title: Some("title".to_string()),
-            description: Some("description".to_string()),
+            title: Some("title".to_owned()),
+            description: Some("description".to_owned()),
             ..Default::default()
         };
-        let receiver_id = "receiver.testnet".to_string();
+        let receiver_id = "receiver.testnet".to_owned();
 
         contract.nft_mint(
             token_id,
             metadata,
             receiver_id,
             Some(HashMap::from([
-                ("account1.testnet".to_string(), 10),
-                ("account2.testnet".to_string(), 20),
-                ("account3.testnet".to_string(), 20),
-                ("account4.testnet".to_string(), 20),
-                ("account5.testnet".to_string(), 20),
-                ("account6.testnet".to_string(), 20),
+                ("account1.testnet".to_owned(), 10),
+                ("account2.testnet".to_owned(), 20),
+                ("account3.testnet".to_owned(), 20),
+                ("account4.testnet".to_owned(), 20),
+                ("account5.testnet".to_owned(), 20),
+                ("account6.testnet".to_owned(), 20),
             ])),
         );
     }
@@ -127,25 +127,25 @@ mod test {
     #[test]
     fn success_nft_mint() {
         let attached = 999999999999999999999999999;
-        let context = get_context("aaa.testnet".to_string(), attached);
+        let context = get_context("aaa.testnet".to_owned(), attached);
         testing_env!(context);
-        let mut contract = HusyContract::new_default("aaa.testnet".to_string());
+        let mut contract = HusyContract::new_default("aaa.testnet".to_owned());
 
-        let token_id = "token.testnet".to_string();
+        let token_id = "token.testnet".to_owned();
         let metadata = MemeTokenMetadata {
-            title: Some("title".to_string()),
-            description: Some("description".to_string()),
+            title: Some("title".to_owned()),
+            description: Some("description".to_owned()),
             ..Default::default()
         };
-        let receiver_id = "receiver.testnet".to_string();
+        let receiver_id = "receiver.testnet".to_owned();
 
         contract.nft_mint(
             token_id.clone(),
             metadata.clone(),
             receiver_id.clone(),
             Some(HashMap::from([
-                ("account1.testnet".to_string(), 10),
-                ("account2.testnet".to_string(), 20),
+                ("account1.testnet".to_owned(), 10),
+                ("account2.testnet".to_owned(), 20),
             ])),
         );
 
@@ -154,8 +154,8 @@ mod test {
             Some(MemeToken {
                 owner_id: receiver_id.clone(),
                 royalty: HashMap::from([
-                    ("account1.testnet".to_string(), 10),
-                    ("account2.testnet".to_string(), 20),
+                    ("account1.testnet".to_owned(), 10),
+                    ("account2.testnet".to_owned(), 20),
                 ]),
                 ..Default::default()
             })
@@ -183,17 +183,17 @@ mod test {
     #[should_panic]
     fn token_already_exist() {
         let attached = 9999999999999999999999999999;
-        let context = get_context("aaa.testnet".to_string(), attached);
+        let context = get_context("aaa.testnet".to_owned(), attached);
         testing_env!(context);
-        let mut contract = HusyContract::new_default("aaa.testnet".to_string());
+        let mut contract = HusyContract::new_default("aaa.testnet".to_owned());
 
-        let token_id = "token.testnet".to_string();
+        let token_id = "token.testnet".to_owned();
         let metadata = MemeTokenMetadata {
-            title: Some("title".to_string()),
-            description: Some("description".to_string()),
+            title: Some("title".to_owned()),
+            description: Some("description".to_owned()),
             ..Default::default()
         };
-        let receiver_id = "receiver.testnet".to_string();
+        let receiver_id = "receiver.testnet".to_owned();
 
         contract.nft_mint(
             token_id.clone(),

@@ -131,11 +131,11 @@ mod test {
     #[test]
     #[should_panic(expected = "Cannot like own meme")]
     fn like_meme_liking_own_meme() {
-        let owner_id = "owner_id.testnet".to_string();
+        let owner_id = "owner_id.testnet".to_owned();
         let context = get_context(owner_id.clone(), YOCTO_NEAR_PER_LIKE);
         testing_env!(context);
         let mut contract = HusyContract::new_default(owner_id.clone());
-        let meme_id = "some_meme_id.testnet".to_string();
+        let meme_id = "some_meme_id.testnet".to_owned();
 
         contract.memes_by_id.insert(
             &meme_id,
@@ -151,17 +151,17 @@ mod test {
     #[test]
     #[should_panic]
     fn like_meme_not_enought_attached_deposit() {
-        let owner_id = "owner_id.testnet".to_string();
+        let owner_id = "owner_id.testnet".to_owned();
         let context = get_context(owner_id.clone(), 10000);
         testing_env!(context);
         let mut contract = HusyContract::new_default(owner_id);
 
-        contract.like_meme("some_meme.testnet".to_string(), 50);
+        contract.like_meme("some_meme.testnet".to_owned(), 50);
     }
 
     #[test]
     fn yocto_near_price_for_like_test() {
-        let owner_id = "owner_id.testnet".to_string();
+        let owner_id = "owner_id.testnet".to_owned();
         let context = get_context(owner_id.clone(), 0);
         testing_env!(context);
         let contract = HusyContract::new_default(owner_id);
@@ -172,12 +172,12 @@ mod test {
 
     #[test]
     fn get_memes_with_filters() {
-        let owner_id = "owner_id.testnet".to_string();
+        let owner_id = "owner_id.testnet".to_owned();
         let context = get_context(owner_id.clone(), 0);
         testing_env!(context);
         let mut contract = HusyContract::new_default(owner_id.clone());
 
-        let category = "some_category".to_string();
+        let category = "some_category".to_owned();
         let showed_on_main = true;
         let from_index = 2u128;
         let limit = 2u64;
@@ -186,107 +186,107 @@ mod test {
                 owner_id: owner_id.clone(),
                 category: Some(category.clone()),
                 showed_on_main,
-                token_id: "expected_token_id_1.testnet".to_string(),
+                token_id: "expected_token_id_1.testnet".to_owned(),
                 ..Default::default()
             },
             MemeTokenView {
                 owner_id: owner_id.clone(),
                 category: Some(category.clone()),
                 showed_on_main,
-                token_id: "expected_token_id_2.testnet".to_string(),
+                token_id: "expected_token_id_2.testnet".to_owned(),
                 ..Default::default()
             },
         ];
         let full_tokens_list = vec![
             MemeTokenView {
-                owner_id: "invalid_owner.testnet".to_string(),
+                owner_id: "invalid_owner.testnet".to_owned(),
                 category: Some(category.clone()),
                 showed_on_main,
-                token_id: "invalid_owner_token_id_1.testnet".to_string(),
+                token_id: "invalid_owner_token_id_1.testnet".to_owned(),
                 ..Default::default()
             },
             MemeTokenView {
                 owner_id: owner_id.clone(),
-                category: Some("invalid_category".to_string()),
+                category: Some("invalid_category".to_owned()),
                 showed_on_main,
-                token_id: "invalid_category_token_id_1.testnet".to_string(),
-                ..Default::default()
-            },
-            MemeTokenView {
-                owner_id: owner_id.clone(),
-                category: Some(category.clone()),
-                showed_on_main: false,
-                token_id: "not_main_token_id_1.testnet".to_string(),
-                ..Default::default()
-            },
-            MemeTokenView {
-                owner_id: owner_id.clone(),
-                category: Some(category.clone()),
-                showed_on_main,
-                token_id: "valid_skipped_token_id_1.testnet".to_string(),
-                ..Default::default()
-            },
-            MemeTokenView {
-                owner_id: owner_id.clone(),
-                category: Some(category.clone()),
-                showed_on_main,
-                token_id: "valid_skipped_token_id_2.testnet".to_string(),
-                ..Default::default()
-            },
-            MemeTokenView {
-                owner_id: owner_id.clone(),
-                category: Some(category.clone()),
-                showed_on_main,
-                token_id: "expected_token_id_1.testnet".to_string(),
-                ..Default::default()
-            },
-            MemeTokenView {
-                owner_id: "invalid_owner.testnet".to_string(),
-                category: Some(category.clone()),
-                showed_on_main,
-                token_id: "invalid_owner_token_id_2.testnet".to_string(),
-                ..Default::default()
-            },
-            MemeTokenView {
-                owner_id: owner_id.clone(),
-                category: Some("invalid_category".to_string()),
-                showed_on_main,
-                token_id: "invalid_category_token_id_2.testnet".to_string(),
+                token_id: "invalid_category_token_id_1.testnet".to_owned(),
                 ..Default::default()
             },
             MemeTokenView {
                 owner_id: owner_id.clone(),
                 category: Some(category.clone()),
                 showed_on_main: false,
-                token_id: "not_main_token_id_2.testnet".to_string(),
+                token_id: "not_main_token_id_1.testnet".to_owned(),
                 ..Default::default()
             },
             MemeTokenView {
                 owner_id: owner_id.clone(),
                 category: Some(category.clone()),
                 showed_on_main,
-                token_id: "expected_token_id_2.testnet".to_string(),
-                ..Default::default()
-            },
-            MemeTokenView {
-                owner_id: "invalid_owner.testnet".to_string(),
-                category: Some(category.clone()),
-                showed_on_main,
-                token_id: "invalid_owner_token_id_3.testnet".to_string(),
+                token_id: "valid_skipped_token_id_1.testnet".to_owned(),
                 ..Default::default()
             },
             MemeTokenView {
                 owner_id: owner_id.clone(),
-                category: Some("invalid_category".to_string()),
+                category: Some(category.clone()),
                 showed_on_main,
-                token_id: "invalid_category_token_id_3.testnet".to_string(),
+                token_id: "valid_skipped_token_id_2.testnet".to_owned(),
+                ..Default::default()
+            },
+            MemeTokenView {
+                owner_id: owner_id.clone(),
+                category: Some(category.clone()),
+                showed_on_main,
+                token_id: "expected_token_id_1.testnet".to_owned(),
+                ..Default::default()
+            },
+            MemeTokenView {
+                owner_id: "invalid_owner.testnet".to_owned(),
+                category: Some(category.clone()),
+                showed_on_main,
+                token_id: "invalid_owner_token_id_2.testnet".to_owned(),
+                ..Default::default()
+            },
+            MemeTokenView {
+                owner_id: owner_id.clone(),
+                category: Some("invalid_category".to_owned()),
+                showed_on_main,
+                token_id: "invalid_category_token_id_2.testnet".to_owned(),
                 ..Default::default()
             },
             MemeTokenView {
                 owner_id: owner_id.clone(),
                 category: Some(category.clone()),
                 showed_on_main: false,
-                token_id: "not_main_token_id_3.testnet".to_string(),
+                token_id: "not_main_token_id_2.testnet".to_owned(),
+                ..Default::default()
+            },
+            MemeTokenView {
+                owner_id: owner_id.clone(),
+                category: Some(category.clone()),
+                showed_on_main,
+                token_id: "expected_token_id_2.testnet".to_owned(),
+                ..Default::default()
+            },
+            MemeTokenView {
+                owner_id: "invalid_owner.testnet".to_owned(),
+                category: Some(category.clone()),
+                showed_on_main,
+                token_id: "invalid_owner_token_id_3.testnet".to_owned(),
+                ..Default::default()
+            },
+            MemeTokenView {
+                owner_id: owner_id.clone(),
+                category: Some("invalid_category".to_owned()),
+                showed_on_main,
+                token_id: "invalid_category_token_id_3.testnet".to_owned(),
+                ..Default::default()
+            },
+            MemeTokenView {
+                owner_id: owner_id.clone(),
+                category: Some(category.clone()),
+                showed_on_main: false,
+                token_id: "not_main_token_id_3.testnet".to_owned(),
                 ..Default::default()
             },
         ];

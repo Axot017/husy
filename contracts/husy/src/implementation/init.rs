@@ -37,9 +37,9 @@ impl ContractInit for HusyContract {
         Self::new(
             owner_id,
             HusyNFTContractMetadata {
-                spec: "nft-1.0.0".to_string(),
-                name: "TestNFT".to_string(),
-                symbol: "TEST".to_string(),
+                spec: "nft-1.0.0".to_owned(),
+                name: "TestNFT".to_owned(),
+                symbol: "TEST".to_owned(),
                 icon: None,
                 base_uri: None,
                 reference: None,

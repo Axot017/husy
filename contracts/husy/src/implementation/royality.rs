@@ -22,18 +22,19 @@ impl NFTRoyality for HusyContract {
     ) -> Payout {
         let sender_id = env::predecessor_account_id();
 
-        with_refund(
-            || {
-                let previous = self.nft_meme_transfer(
-                    sender_id,
-                    receiver_id,
-                    token_id.clone(),
-                    Some(approval_id),
-                    memo,
-                );
-                (self.get_meme_payout(token_id, balance, max_len_payout), Some(previous.owner_id))
-            },
-        )
+        with_refund(|| {
+            let previous = self.nft_meme_transfer(
+                sender_id,
+                receiver_id,
+                token_id.clone(),
+                Some(approval_id),
+                memo,
+            );
+            (
+                self.get_meme_payout(token_id, balance, max_len_payout),
+                Some(previous.owner_id),
+            )
+        })
     }
 }
 
@@ -58,18 +59,18 @@ mod test {
     #[test]
     #[should_panic]
     fn nft_payout_to_much_payout_accounts() {
-        let account_id = "sdafasdfsd.testnet".to_string();
+        let account_id = "sdafasdfsd.testnet".to_owned();
         let context = get_context(account_id.clone(), 0);
         testing_env!(context);
-        let mut contract = HusyContract::new_default("bbb.testnet".to_string());
+        let mut contract = HusyContract::new_default("bbb.testnet".to_owned());
 
-        let meme_id = "asvjfljl.testnet".to_string();
+        let meme_id = "asvjfljl.testnet".to_owned();
         contract.memes_by_id.insert(
             &meme_id,
             &MemeToken {
                 royalty: HashMap::from([
-                    ("1.testnet".to_string(), 100),
-                    ("2.testnet".to_string(), 200),
+                    ("1.testnet".to_owned(), 100),
+                    ("2.testnet".to_owned(), 200),
                 ]),
                 owner_id: account_id,
                 ..Default::default()
@@ -81,18 +82,18 @@ mod test {
 
     #[test]
     fn nft_payout_success() {
-        let account_id = "sdafasdfsd.testnet".to_string();
+        let account_id = "sdafasdfsd.testnet".to_owned();
         let context = get_context(account_id.clone(), 0);
         testing_env!(context);
-        let mut contract = HusyContract::new_default("bbb.testnet".to_string());
+        let mut contract = HusyContract::new_default("bbb.testnet".to_owned());
 
-        let meme_id = "asvjfljl.testnet".to_string();
+        let meme_id = "asvjfljl.testnet".to_owned();
         contract.memes_by_id.insert(
             &meme_id,
             &MemeToken {
                 royalty: HashMap::from([
-                    ("1.testnet".to_string(), 100),
-                    ("2.testnet".to_string(), 200),
+                    ("1.testnet".to_owned(), 100),
+                    ("2.testnet".to_owned(), 200),
                     (account_id.clone(), 900),
                 ]),
                 owner_id: account_id.clone(),
@@ -106,8 +107,8 @@ mod test {
             result,
             Payout {
                 payout: HashMap::from([
-                    ("1.testnet".to_string(), U128(1_000)),
-                    ("2.testnet".to_string(), U128(2_000)),
+                    ("1.testnet".to_owned(), U128(1_000)),
+                    ("2.testnet".to_owned(), U128(2_000)),
                     (account_id, U128(97_000))
                 ]),
             }

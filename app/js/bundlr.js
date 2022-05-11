@@ -5,12 +5,12 @@ const initialize = async (node, currency) => {
         return;
     }
 
-    window._bundlr = new window.webBundlr(node, currency, window._wallet);
+    window._bundlr = new WebBundlr(node, currency, window._wallet);
     await window._bundlr.ready()
 };
 
 const init = () => {
-    window.bundlrInitialize = initialize;
+    window.bundlr_initialize = initialize;
 };
 
 module.exports = {

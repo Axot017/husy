@@ -22,9 +22,9 @@ const isLoggedIn = () => {
 };
 
 const init = () => {
-    window.nearInitialize = initialize;
-    window.isLoggedIn = isLoggedIn;
-    window.requestSignIn = requestSignIn;
+    window.near_initialize = initialize;
+    window.is_logged_in = isLoggedIn;
+    window.request_sign_in = requestSignIn;
 };
 
 module.exports = {

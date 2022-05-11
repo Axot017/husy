@@ -9,7 +9,7 @@ pub fn app() -> Html {
     let onclick = Callback::once(move |_| history.push(MainRoute::Subpage));
     html! {
         <div>
-            <h1>{ "Secure" }</h1>
+            <h1>{ "Home" }</h1>
             <button {onclick}>{ "Go subpage" }</button>
         </div>
     }

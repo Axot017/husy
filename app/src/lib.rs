@@ -1,7 +1,8 @@
-use crate::{app::App, data::config::dtos::app_config_dto::AppConfigDto, domain::config::app_config::AppConfig};
+use crate::{
+    app::App, data::config::dtos::app_config_dto::AppConfigDto,
+    domain::config::app_config::AppConfig,
+};
 use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
-
-extern crate stdweb;
 
 mod app;
 mod core;

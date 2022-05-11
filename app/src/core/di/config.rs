@@ -2,18 +2,18 @@ use once_cell::sync::OnceCell;
 
 use crate::domain::config::app_config::AppConfig;
 
-use super::get::GetRef;
+use super::get::Get;
 
-static INSTANCE: OnceCell<AppConfig> = OnceCell::new();
+static INSTANCE: OnceCell<Box<AppConfig>> = OnceCell::new();
 
-impl<'a> GetRef<'a> for AppConfig {
-    fn get_ref() -> &'a Self {
-        INSTANCE.get().unwrap()
+impl Get for Box<AppConfig> {
+    fn get() -> Self {
+        INSTANCE.get().unwrap().to_owned()
     }
 }
 
 impl AppConfig {
     pub fn save(self) {
-        INSTANCE.set(self).unwrap();
+        INSTANCE.set(Box::new(self)).unwrap();
     }
 }

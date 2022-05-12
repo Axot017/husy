@@ -9,8 +9,10 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 once_cell = "1.10"
 log = "0.4"
+js-sys = "0.3"
 serde = "1.0"
 wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
 yew = "0.19"
 wasm-logger = "0.2"
 yew-router = "0.16"

@@ -27,10 +27,12 @@ dependencies = [
 name = "app"
 version = "0.1.0"
 dependencies = [
+ "js-sys",
  "log",
  "once_cell",
  "serde",
  "wasm-bindgen",
+ "wasm-bindgen-futures",
  "wasm-logger",
  "yew",
  "yew-router",

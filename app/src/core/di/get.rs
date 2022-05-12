@@ -1,3 +1,3 @@
-pub trait Get {
+pub trait GetIt {
     fn get() -> Self;
 }

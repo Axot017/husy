@@ -1,4 +1,4 @@
-#[derive(PartialEq, Clone, Debug)]
+#[derive(Default, PartialEq, Clone, Debug)]
 pub struct AppConfig {
     pub near_network_id: String,
     pub near_node_url: String,
